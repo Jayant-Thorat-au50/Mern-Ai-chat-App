@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import UserModel from "../../Models/UserModel.js";
 
 export const signUp = async ({email, password}) => {

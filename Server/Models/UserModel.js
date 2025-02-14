@@ -26,7 +26,7 @@ userSchema.statics.hashPassword = async function (password){
 userSchema.methods = {
   JwtToken() {
     return JWT.sign(
-      {email: this.email} ,process.env.JWT_SECRET,
+      {email: this.email, id:this._id} ,process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
   },
