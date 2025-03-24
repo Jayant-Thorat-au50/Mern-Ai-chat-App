@@ -19,9 +19,13 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.statics.hashPassword = async function (password){
-  return await bcrypt.hash(password, 10)
-}
+userSchema.pre('save',async function (){
+   this.password = await bcrypt.hash(this.password, 10)
+})
+
+// userSchema.statics.hashPassword = async function (password){
+//   this.password = await bcrypt.hash(password, 10)
+// }
 
 userSchema.methods = {
   JwtToken() {
@@ -33,6 +37,6 @@ userSchema.methods = {
 };
 
 
-const UserModel = model('user', userSchema)
+const UserModel = model('users', userSchema)
 
 export default UserModel;

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { getProfile, loginController, logout, signUpController } from "../Controller/UserController.js";
+import { deleteAllusers, getProfile, loginController, logout, signUpController } from "../Controller/UserController.js";
 import { body } from "express-validator";
 import { jwtAuth } from "../Middlewares/jwtAuth.js";
 
 const userRoutes = Router();
 
 userRoutes.post('/register', 
-    body('email').isEmail().withMessage("Invalied email"),
+    body('email').isEmail().withMessage("Invalid email"),
     body('password').isLength({min:3}).withMessage("password must be at least 3 charactres long"),
     signUpController
 )
@@ -22,5 +22,7 @@ userRoutes.get('/getUser',
 )
 
 userRoutes.get('/logout', logout)
+
+userRoutes.delete('/delete', deleteAllusers)
 
 export default userRoutes;
