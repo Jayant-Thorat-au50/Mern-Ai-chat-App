@@ -21,7 +21,8 @@ userRoutes.get('/getUser',
     getProfile
 )
 
-userRoutes.get('/logout', logout)
+
+userRoutes.get('/logout',jwtAuth, logout)
 
 userRoutes.delete('/delete', deleteAllusers)
 

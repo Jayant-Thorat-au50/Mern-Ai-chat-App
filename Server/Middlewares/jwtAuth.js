@@ -1,7 +1,7 @@
 import JWT from "jsonwebtoken";
 
 export const jwtAuth = async (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.headers.token;
 
   console.log(token);
   
@@ -12,9 +12,13 @@ export const jwtAuth = async (req, res, next) => {
     });
   }
 
-  const payload =  JWT.verify(token, process.env.JWT_SECRET);
+  const decoded =  JWT.verify(token, process.env.JWT_SECRET);
 
-  req.user = payload;
+    if(!decoded){
+      res.status(401).json({error: "Invalid token"})
+    }
+  req.user = decoded;
+  req.user
 
   next();
 };

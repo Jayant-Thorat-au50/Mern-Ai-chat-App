@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import * as userServices from "./services/user.services.js";
 import bcrypt from "bcrypt";
 import emailValidate from "email-validator";
+// import redisClient from "./services/redisServices.js";
 
 export const signUpController = async (req, res, next) => {
   const { email, password } = req.body;
@@ -144,7 +145,9 @@ export const getProfile = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
+    res.setHeader("Authorization", `Bearer ${null}`);
     res.cookie("token", null);
+    // redisClient.set(token)
     return res.status(200).json({
       message: "user logged out successfully",
     });

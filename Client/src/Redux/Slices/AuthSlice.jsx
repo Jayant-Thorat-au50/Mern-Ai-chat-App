@@ -3,8 +3,9 @@ import axiosinstace from "../../Helpers/AxiosInstance";
 import toast from "react-hot-toast";
 
 const initialState = {
-  user: "",
-  isLoggedIn: "",
+  user: localStorage.getItem("user") || {},
+  isLoggedIn: localStorage.getItem('isLoggedIn') || null,
+  token: localStorage.getItem('token') || null,
   role: "",
 };
 
@@ -58,10 +59,62 @@ export const login = createAsyncThunk("/user/login", async (data) => {
   }
 });
 
+export const getProfile = createAsyncThunk('/user/get-profile', async () => {
+  try {
+    const response = await axiosinstace.get('/user/getUser',{
+      headers:{
+        token: JSON.parse(localStorage.getItem('token'))
+      }
+    })
+
+    return response.data
+  } catch (error) {
+    return error.response.data
+  }
+})
+export const logout = createAsyncThunk('/user/logout', async () => {
+  try {
+    const response = await axiosinstace.get('/user/logout',{
+      headers:{
+        token: JSON.parse(localStorage.getItem('token'))
+      }
+    })
+
+    return response.data
+  } catch (error) {
+    return error.response.data
+  }
+})
+
 const AuthSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {},
+  extraReducers:(builder) => {
+    builder
+    .addCase(signUp.fulfilled, (state, action) => {
+      state.user = action.payload.User
+      state.isLoggedIn = true;
+      localStorage.setItem('user', JSON.stringify(action.payload.User))
+      localStorage.setItem('isLoggedIn', true),
+      localStorage.setItem('token', JSON.stringify(action.payload.token))
+    })
+    .addCase(login.fulfilled, (state, action) => {
+      state.user = action.payload.user
+      state.isLoggedIn = true;
+      localStorage.setItem('user', JSON.stringify(action.payload.user))
+      localStorage.setItem('isLoggedIn', true)
+    })
+    .addCase(logout.fulfilled, (state, action) => {
+      localStorage.clear()
+      console.log(action.payload);
+    })
+    .addCase(getProfile.fulfilled, (state, action) => { 
+      state.user = action.payload.user
+      localStorage.setItem('user', JSON.stringify(action.payload.user))
+      console.log(action.payload);    
+  })
+}
 });
 
 export default AuthSlice.reducer;

@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../Redux/Slices/AuthSlice";
 
@@ -11,6 +11,8 @@ const LoginModall = () => {
     email: "",
     password: "",
   });
+
+   
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +47,7 @@ const LoginModall = () => {
       });
       navigate("/");
     } else {
-    
+
       setIsSubmitting(false);
     }
   };
