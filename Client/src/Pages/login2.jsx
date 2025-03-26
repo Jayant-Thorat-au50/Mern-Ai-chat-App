@@ -30,10 +30,10 @@ const LoginModall = () => {
       toast.error("please enter a valid email");
       return;
     }
-    // if (userData.password.length < 3) {
-    //   toast.error("password must be at least 3 chars long");
-    //   return;
-    // }
+    if (userData.password.length < 3) {
+      toast.error("password must be at least 3 chars long");
+      return;
+    }
 
     setIsSubmitting(true);
 

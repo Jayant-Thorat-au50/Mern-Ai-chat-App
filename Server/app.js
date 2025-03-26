@@ -6,6 +6,7 @@ import dbConnect from "./dbConnect.js";
 import userRoutes from "./Routes/userRoutes.js";
 import cookieParser from "cookie-parser";
 import cors from 'cors'
+import projectsRoutes from "./Routes/projectRoutes.js";
 
 
 const app = express();
@@ -21,6 +22,6 @@ app.use(express.urlencoded({extended:true}))
 dbConnect();
 
 app.use('/api/v1/user', userRoutes)
-app.use('/api/v1/project', projec)
+app.use('/api/v1/project', projectsRoutes)
 
 export default app;

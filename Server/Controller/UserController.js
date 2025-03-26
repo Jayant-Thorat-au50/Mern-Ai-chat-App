@@ -120,6 +120,7 @@ export const loginController = async (req, res) => {
     res.cookie("token", token, { httpOnly: true });
 
     return res.status(200).json({
+      success:true,
       user,
       token,
     });
@@ -149,6 +150,7 @@ export const logout = (req, res) => {
     res.cookie("token", null);
     // redisClient.set(token)
     return res.status(200).json({
+      success:true,
       message: "user logged out successfully",
     });
   } catch (error) {

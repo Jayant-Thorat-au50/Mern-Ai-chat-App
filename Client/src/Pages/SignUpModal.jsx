@@ -5,14 +5,17 @@ import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { signUp } from "../Redux/Slices/AuthSlice";
+import { X, UploadCloud } from "lucide-react";
 
 const SignUpmodal = ({ onClose }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [previewImg, setPrevImg] = useState(null);
   const [userData, setUserData] = useState({
     name: "",
     email: "",
     password: "",
+    avatar: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,10 +54,23 @@ const SignUpmodal = ({ onClose }) => {
     });
   };
 
+  const getImg = (e) => {
+    const uploadedImg = e.target.files[0];
+
+    if (uploadedImg) {
+      setUserData({
+        ...userData,
+        avatar: uploadedImg,
+      });
+
+      setPrevImg(URL.createObjectURL(uploadedImg));
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div className="  bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
-        <div className="relative p-6">
+        <div className="relative p-6 ">
           {/* Close Button */}
           <button
             onClick={onClose}
@@ -67,6 +83,45 @@ const SignUpmodal = ({ onClose }) => {
               Welcome To CourseWala
             </h2>
             <p className="text-gray-500">Sign Up to get started</p>
+          </div>
+
+          <div
+            className={
+              previewImg
+                ? "border-2  w-1/2 mx-auto  border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-all bg-gray-50"
+                : "border-2  w-1/2 mx-auto  border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-all bg-gray-50"
+            }
+            onDragOver={(e) => e.preventDefault()}
+          >
+            {previewImg ? (
+              <div className=" relative w-full h-full">
+                <img src={previewImg} className=" w-full h-32" />
+                <div className=" absolute top-0 right-0 w-full flex justify-end">
+                  <button
+                    className=" bg-red-500 text-white p-1 rounded-full"
+                    onClick={() => setPrevImg(null)}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className=" p-4 w-full h-full">
+                <label className="flex flex-col items-center cursor-pointer">
+                  <UploadCloud className="text-gray-500 mb-2" size={40} />
+                  <span className="text-gray-600 text-sm">
+                    Drag & drop or click to upload
+                  </span>
+                  <input
+                    type="file"
+                    src={previewImg}
+                    onChange={getImg}
+                    className="hidden"
+                    accept="image/*"
+                  />
+                </label>
+              </div>
+            )}
           </div>
 
           {/* Form */}
