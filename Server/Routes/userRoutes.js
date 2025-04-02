@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteAllusers, getProfile, loginController, logout, signUpController } from "../Controller/UserController.js";
+import { deleteAllusers, getAllUsers, getProfile, loginController, logout, signUpController } from "../Controller/UserController.js";
 import { body } from "express-validator";
 import { jwtAuth } from "../Middlewares/jwtAuth.js";
 
@@ -21,6 +21,7 @@ userRoutes.get('/getUser',
     getProfile
 )
 
+userRoutes.get('/allUsers', jwtAuth, getAllUsers)
 
 
 userRoutes.get('/logout',jwtAuth, logout)

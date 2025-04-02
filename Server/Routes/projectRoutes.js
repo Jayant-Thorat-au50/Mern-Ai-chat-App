@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addUsersToProject,
   createProjectController,
   getAllProjects,
 } from "../Controller/projectController.js";
@@ -16,4 +17,6 @@ projectsRoutes.post(
 );
 
 projectsRoutes.get("/allProjects", jwtAuth, getAllProjects);
+
+projectsRoutes.put("/addUsersInProject", jwtAuth, addUsersToProject);
 export default projectsRoutes;

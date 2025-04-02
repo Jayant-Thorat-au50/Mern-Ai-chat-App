@@ -107,9 +107,8 @@ export const loginController = async (req, res) => {
       res.status(401).json({ errors: "Invalid user" });
     }
 
-    const isPasswordValid =  bcrypt.compare(password, user.password);
+    const isPasswordValid = bcrypt.compare(password, user.password);
 
-    
     if (!isPasswordValid) {
       return res.status(400).json({
         errors: "Inavlid email or password",
@@ -122,7 +121,7 @@ export const loginController = async (req, res) => {
     user.password = undefined;
 
     return res.status(200).json({
-      success:true,
+      success: true,
       user,
       token,
     });
@@ -152,7 +151,7 @@ export const logout = (req, res) => {
     res.cookie("token", null);
     // redisClient.set(token)
     return res.status(200).json({
-      success:true,
+      success: true,
       message: "user logged out successfully",
     });
   } catch (error) {
@@ -166,5 +165,27 @@ export const deleteAllusers = async (req, res) => {
     console.log(response);
   } catch (error) {
     console.log(error.message);
+  }
+};
+
+export const getAllUsers = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const Allusers = await UserModel.find({
+      _id: { $ne: id },
+    });
+
+    if (!Allusers) {
+      throw new Error("failed to fetch all users");
+    }
+    return res.status(200).json({
+      success: true,
+      allUsesr: Allusers,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

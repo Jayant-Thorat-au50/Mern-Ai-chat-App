@@ -50,7 +50,7 @@ function Home() {
   
   useEffect(() => { 
   
-       (async getProjectList => {
+       (async () => {
           const response = await dispacth(getAllProjects())
           console.log(response);
           return response;

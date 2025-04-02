@@ -3,10 +3,6 @@ import JWT from "jsonwebtoken";
 export const jwtAuth = async (req, res, next) => {
   const token = req.headers.token || req.cookies.token;
 
-  console.log(req.headers);
-  
-  
-
   if (!token) {
     return res.status(400).json({
       error: "unauthorized user plaese login again",

@@ -10,7 +10,7 @@ function Projects() {
 
     useEffect(() => { 
 
-     (async getProjectList => {
+     (async () => {
         const response = await dispatch(getAllProjects())
         console.log(response);
         return response;
