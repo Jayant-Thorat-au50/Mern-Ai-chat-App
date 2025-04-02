@@ -5,7 +5,7 @@ export const createProject = async ({name, userId}) => {
   try {
     const newProject = await ProjectModel.create({
         name:name,
-        userId:userId
+        users:userId
     })
     return await newProject.save();
   } catch (error) {
@@ -13,3 +13,13 @@ export const createProject = async ({name, userId}) => {
   }
 }   
 
+export const getAllUsersProjects = async ({userId}) => {
+
+  if(!userId){
+    throw new Error('userId is required')
+  }
+
+  const AllUsersProjects = await ProjectModel.find({users:userId});
+
+  return AllUsersProjects;
+}

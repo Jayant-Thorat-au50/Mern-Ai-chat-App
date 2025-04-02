@@ -107,9 +107,9 @@ export const loginController = async (req, res) => {
       res.status(401).json({ errors: "Invalid user" });
     }
 
-    const isPasswordValid = bcrypt.compare(password, user.password);
+    const isPasswordValid =  bcrypt.compare(password, user.password);
 
-    user.password = undefined;
+    
     if (!isPasswordValid) {
       return res.status(400).json({
         errors: "Inavlid email or password",
@@ -118,6 +118,8 @@ export const loginController = async (req, res) => {
 
     const token = await user.JwtToken();
     res.cookie("token", token, { httpOnly: true });
+
+    user.password = undefined;
 
     return res.status(200).json({
       success:true,

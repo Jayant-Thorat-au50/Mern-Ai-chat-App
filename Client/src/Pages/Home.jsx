@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAllusers, getProfile, logout } from "../Redux/Slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import { createProject } from "../Redux/Slices/Projectslices";
+import { createProject, getAllProjects } from "../Redux/Slices/Projectslices";
 
 function Home() {
   const dispacth = useDispatch();
@@ -41,9 +41,22 @@ function Home() {
     const response = await dispacth(createProject(newProject));
 
     if (response.payload.success) {
-      console.log("created");
+      setNewProject({
+        name: "",
+      });
+      setCreateProjectModal(false);
     }
   };
+  
+  useEffect(() => { 
+  
+       (async getProjectList => {
+          const response = await dispacth(getAllProjects())
+          console.log(response);
+          return response;
+       })()
+  
+      }, [])
 
   return (
     <>
@@ -78,11 +91,19 @@ function Home() {
         {isLoggedIn && <button onClick={handlegetProfile}>get user</button>}
       </div>
 
-      {isLoggedIn && (
-        <button onClick={() => setCreateProjectModal(true)}>
-          create project
-        </button>
-      )}
+      <div className=" flex flex-col">
+        {isLoggedIn && (
+          <button onClick={() => setCreateProjectModal(true)}>
+            create project
+          </button>
+        )}
+
+        {isLoggedIn && (
+          <button onClick={() => navigate("/projects")}>
+            get All projects
+          </button>
+        )}
+      </div>
 
       {/* create project modal */}
 

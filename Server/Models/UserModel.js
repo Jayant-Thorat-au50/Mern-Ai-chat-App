@@ -20,11 +20,12 @@ const userSchema = new Schema({
 });
 
 userSchema.pre("save", async function () {
-  this.password = await bcrypt.hash(this.password, 10);
+ return await bcrypt.hash(this.password, 10);
+  
 });
 
 // userSchema.statics.hashPassword = async function (password){
-//   this.password = await bcrypt.hash(password, 10)
+//  return this.password = await bcrypt.hash(password, 10)
 // }
 
 userSchema.methods = {

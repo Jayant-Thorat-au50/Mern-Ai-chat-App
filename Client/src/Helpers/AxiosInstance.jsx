@@ -1,10 +1,9 @@
-import axios from 'axios'
+import axios from "axios";
 
-const axiosinstace = axios.create();
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8080/api/v1",
+});
 
+axios.defaults.withCredentials = true;
 
-
-axiosinstace.defaults.baseURL = 'http://localhost:8080/api/v1';
-axios.defaults.withCredentials = true
-
-export default axiosinstace
+export default axiosInstance;
