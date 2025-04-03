@@ -11,6 +11,7 @@ import AdminRequests from './Pages/SuperAdminRequests.jsx'
 import SuperAdminRequests from './Pages/SuperAdminRequests.jsx'
 import HeroSectionLMS from './Pages/HeroSectionLMS.jsx'
 import Projects from './Pages/Projects.jsx'
+import ShowProject from './Pages/showProject.jsx'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
    <Route path='/adminRequests' element={<SuperAdminRequests/>}  />
    <Route path='/herosection' element={<HeroSectionLMS/>}  />
    <Route path='/projects' element={<Projects/>}  />
+   <Route path='/project-details' element={<ShowProject/>}  />
 
 
    </Routes>

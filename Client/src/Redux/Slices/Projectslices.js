@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosinstace from "../../Helpers/AxiosInstance";
 import toast from "react-hot-toast";
+import { CatIcon } from "lucide-react";
 
 const initialState = {
  projectsList:[]
@@ -61,6 +62,12 @@ const projcetSlice = createSlice({
   name: "projects",
   initialState,
   reducers: {},
+  extraReducers:(builder) => {
+    builder
+    .addCase(getAllProjects.fulfilled, (state, action) => {
+      state.projectsList  = action.payload.projects
+    })
+  }
 });
 
 export default projcetSlice.reducer;

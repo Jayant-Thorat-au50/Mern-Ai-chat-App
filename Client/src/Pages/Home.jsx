@@ -3,14 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteAllusers, getProfile, logout } from "../Redux/Slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import {FaPlus} from 'react-icons/fa'
 import { createProject, getAllProjects } from "../Redux/Slices/Projectslices";
+import axiosInstance from "../Helpers/AxiosInstance";
+import Projects from "../component/projects";
 
 function Home() {
   const dispacth = useDispatch();
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem("user"));
   const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedIn"));
-  const projectList = useSelector((state) => state.projectstate.projects);
+  const projects = useSelector(state => state.projectstate.projectsList)
 
   const [newProject, setNewProject] = useState({
     name: "",
@@ -41,26 +44,22 @@ function Home() {
     const response = await dispacth(createProject(newProject));
 
     if (response.payload.success) {
+      await dispacth(getAllProjects());
       setNewProject({
         name: "",
       });
       setCreateProjectModal(false);
     }
   };
-  
-  useEffect(() => { 
-  
-       (async () => {
-          const response = await dispacth(getAllProjects())
-          console.log(response);
-          return response;
-       })()
-  
-      }, [])
+
+
 
   return (
     <>
-      <div className=" flex flex-col gap-5">
+
+    <header className=" flex justify-between items-center bg-gray-800 text-white p-4">
+
+      <div className=" flex gap-5">
         <div>Home</div>
         <button onClick={deleteAllusersfromCo}>delete</button>
         {isLoggedIn ? (
@@ -75,7 +74,6 @@ function Home() {
           </button>
         )}
       </div>
-
       <div className="flex flex-col gap-5 w-1/2">
         {userData && (
           <input
@@ -86,10 +84,20 @@ function Home() {
           />
         )}
       </div>
-
       <div>
         {isLoggedIn && <button onClick={handlegetProfile}>get user</button>}
       </div>
+    </header>
+
+
+      <div>
+        {
+          projects.map((project) => {
+            <h1 className=" text-black text-xl">{project.name}</h1>;
+          })}
+      </div>
+
+
 
       <div className=" flex flex-col">
         {isLoggedIn && (
@@ -98,13 +106,21 @@ function Home() {
           </button>
         )}
 
-        {isLoggedIn && (
-          <button onClick={() => navigate("/projects")}>
-            get All projects
-          </button>
-        )}
+       
       </div>
 
+      {/* projects List */}
+
+      <button
+      onClick={() => setCreateProjectModal(true)}
+      className=" border-2 flex items-center justify-between gap-2 w-44 border-blue-500 p-4">
+       <span> Add project</span>
+      <FaPlus/>
+      </button>
+
+      {isLoggedIn && <Projects/>}
+
+      
       {/* create project modal */}
 
       {createProjectModalOpen && (
@@ -127,7 +143,7 @@ function Home() {
 
             <input
               type="text"
-              className="w-full p-3 border rounded-lg dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full p-3 border rounded-lg text-black outline-none"
               placeholder="My Awesome Project"
               value={newProject.name}
               onChange={(e) => setNewProject({ name: e.target.value })}

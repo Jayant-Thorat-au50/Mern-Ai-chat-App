@@ -3,6 +3,7 @@ import {
   addUsersToProject,
   createProjectController,
   getAllProjects,
+  getProject,
 } from "../Controller/projectController.js";
 import { body } from "express-validator";
 import { jwtAuth } from "../Middlewares/jwtAuth.js";
@@ -19,4 +20,6 @@ projectsRoutes.post(
 projectsRoutes.get("/allProjects", jwtAuth, getAllProjects);
 
 projectsRoutes.put("/addUsersInProject", jwtAuth, addUsersToProject);
+
+projectsRoutes.get("/get-project", jwtAuth, getProject)
 export default projectsRoutes;

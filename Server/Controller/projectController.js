@@ -4,7 +4,9 @@ import {
   addUserInProject,
   createProject,
   getAllUsersProjects,
+  getProjectdetails,
 } from "./services/projectsrvices.js";
+import mongoose from "mongoose";
 
 export const createProjectController = async (req, res) => {
   const validate = validationResult(req.body);
@@ -66,3 +68,24 @@ export const addUsersToProject = async (req, res) => {
   })
  }
 };
+
+export const getProject = async (req, res) => {
+  
+  try {
+
+  const {projectId} = req.body;
+
+    const project = await getProjectdetails({projectId:projectId})
+
+    res.status(200).json({
+      success:true,
+      project:project
+    });
+    
+  } catch (error) {
+    return res.status(400).json({
+      success:false,
+      message:error.message
+    })
+  }
+}

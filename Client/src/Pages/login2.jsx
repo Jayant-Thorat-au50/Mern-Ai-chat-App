@@ -47,7 +47,8 @@ const LoginModall = () => {
       });
       navigate("/");
     } else {
-
+    console.log('failed');
+    
       setIsSubmitting(false);
     }
   };

@@ -1,27 +1,28 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { getAllProjects } from "../Redux/Slices/Projectslices";
-
-
+import React, { useEffect, useState } from 'react'
+import axiosInstance from '../Helpers/AxiosInstance'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAllProjects } from '../Redux/Slices/Projectslices'
 
 function Projects() {
 
-    const dispatch = useDispatch()
+  const dispatch = useDispatch()
+  const projects = useSelector(state => state.projectstate.projectsList)
 
-    useEffect(() => { 
+  useEffect(()=> {
+    (async () => {
+      await dispatch(getAllProjects())
+    })()
+  },[])
 
-     (async () => {
-        const response = await dispatch(getAllProjects())
-        console.log(response);
-        return response;
-     })()
-
-    }, [])
+  console.log(projects);
+  
   return (
     <div>
-      <h1>Projects</h1>
+      {
+         projects.map(ele => <h1 key={ele._id}>{ele.name}</h1>)
+      }
     </div>
-  );
+  )
 }
 
-export default Projects;
+export default Projects
