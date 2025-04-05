@@ -3,14 +3,22 @@ import { FiSend } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
-import { FaUser } from "react-icons/fa";
+import { FaPlus, FaUser } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { getAllUsers } from "../Redux/Slices/AuthSlice";
 
 function ShowProject() {
   const [existsingUsersOpen, setExistsingUsersOpen] = useState(true);
 
   const { state } = useLocation();
+  const dispacth = useDispatch();
 
   console.log(state);
+
+  const getAllUsersList = async () => {
+         const response = await dispacth(getAllUsers())
+         console.log(response);
+  }
   
 
   return (
@@ -45,7 +53,14 @@ function ShowProject() {
 
         {/* header of the window */}
 
-        <header className=" py-2 flex justify-end px-5 bg-slate-400 w-full">
+        <header className=" py-2 flex justify-between items-center px-5 bg-slate-400 w-full">
+
+          <div className=" flex gap-2 items-center border-black px-2 border py-1 rounded-md ">
+            <FaPlus/>
+            <button
+            onClick={getAllUsersList}
+            >Add collaborators</button>
+          </div>
           <TiGroup
             onClick={() => setExistsingUsersOpen(!existsingUsersOpen)}
             className=" rounded-full border-2 p-1 border-gray-800 text-4xl"

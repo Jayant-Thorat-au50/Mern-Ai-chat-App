@@ -180,7 +180,7 @@ export const getAllUsers = async (req, res) => {
     }
     return res.status(200).json({
       success: true,
-      allUsesr: Allusers,
+      allUsers: Allusers,
     });
   } catch (error) {
     res.status(400).json({
