@@ -87,7 +87,7 @@ export const logout = createAsyncThunk("/user/logout", async () => {
   }
 });
 
-export const getAllUsers = createAsyncThunk('users/all', async () => {
+export const getAllUsers = createAsyncThunk('/users/all', async () => {
   try {
       const response = await axiosInstance.get('/user/allUsers' , {
         headers:{
