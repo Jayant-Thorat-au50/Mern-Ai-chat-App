@@ -5,6 +5,7 @@ import { FaEyeSlash, FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../Redux/Slices/AuthSlice";
+import { IoMdClose } from "react-icons/io";
 
 const LoginModall = () => {
   const [userData, setUserData] = useState({
@@ -12,14 +13,12 @@ const LoginModall = () => {
     password: "",
   });
 
-   
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
     if (!userData.email || !userData.password) {
       toast.error("please fill in all fields");
@@ -47,8 +46,8 @@ const LoginModall = () => {
       });
       navigate("/");
     } else {
-    console.log('failed');
-    
+      console.log("failed");
+
       setIsSubmitting(false);
     }
   };
@@ -67,7 +66,9 @@ const LoginModall = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
         <div className="relative p-6">
-          <button className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 transition-colors"></button>
+          <button className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 transition-colors">
+            <IoMdClose className=" text-2xl" />
+          </button>
 
           {/* Header */}
           <div className="text-center mb-8">

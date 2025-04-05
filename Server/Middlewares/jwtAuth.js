@@ -12,7 +12,7 @@ export const jwtAuth = async (req, res, next) => {
   const decoded =  JWT.verify(token, process.env.JWT_SECRET);
 
     if(!decoded){
-      res.status(401).json({error: "Invalid token"})
+      res.status(401).json({message: "Invalid token"})
     }
   req.user = decoded;
   req.user
