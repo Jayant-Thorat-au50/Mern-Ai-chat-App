@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import * as userServices from "./services/user.services.js";
 import bcrypt from "bcrypt";
 import emailValidate from "email-validator";
+import ProjectModel from "../Models/ProjectModel.js";
 // import redisClient from "./services/redisServices.js";
 
 export const signUpController = async (req, res, next) => {
@@ -161,7 +162,7 @@ export const logout = (req, res) => {
 
 export const deleteAllusers = async (req, res) => {
   try {
-    const response = await UserModel.deleteMany({});
+    const response = await ProjectModel.deleteMany({});
     console.log(response);
   } catch (error) {
     console.log(error.message);

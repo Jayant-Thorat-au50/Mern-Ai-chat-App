@@ -2,6 +2,7 @@ import express from "express";
 import {
   addUsersToProject,
   createProjectController,
+  deleteProject,
   getAllProjects,
   getProject,
 } from "../Controller/projectController.js";
@@ -19,7 +20,14 @@ projectsRoutes.post(
 
 projectsRoutes.get("/allProjects", jwtAuth, getAllProjects);
 
-projectsRoutes.put("/addUsersInProject", jwtAuth, addUsersToProject);
+projectsRoutes.put(
+  "/addUsersInProject",
+  body("users").isArray().withMessage("Users are required"),
+  body("projectId").isString().withMessage("Project ID is required"),
+  jwtAuth,
+  addUsersToProject
+);
 
-projectsRoutes.get("/get-project", jwtAuth, getProject)
+projectsRoutes.post("/get-project/:projectId", jwtAuth, getProject);
+projectsRoutes.get("/delete-project", jwtAuth, deleteProject);
 export default projectsRoutes;

@@ -24,6 +24,8 @@ export const getAllUsersProjects = async ({ userId }) => {
 };
 
 export const addUserInProject = async ({ userId, projectId, users }) => {
+  console.log(users);
+
   if (!mongoose.Types.ObjectId.isValid(projectId)) {
     throw new Error("Invalid project id");
   }
@@ -58,21 +60,33 @@ export const addUserInProject = async ({ userId, projectId, users }) => {
     }
   );
 
-  return updatedProject;
+  return updatedProject.populate("users");
 };
 
 export const getProjectdetails = async ({ projectId: projectId }) => {
+  if (!projectId) {
+    throw new Error("project Id is required");
+  }
 
-    if (!projectId) {
-      throw new Error("project Id is required");
-    }
+  if (!mongoose.Types.ObjectId.isValid(projectId)) {
+    throw new Error("Invalid project Id");
+  }
 
-    if (!mongoose.Types.ObjectId.isValid(projectId)) {
-      throw new Error("Invalid project Id");
-    }
+  const project = await ProjectModel.findById(projectId).populate("users");
 
-    const project = await ProjectModel.findById(projectId).populate("users");
+  return project;
+};
 
-    return project;
+export const deleteProjectService = async ({ projectId }) => {
+  if (!projectId) {
+    throw new Error("project Id is required");
+  }
 
+  if (!mongoose.Types.ObjectId.isValid(projectId)) {
+    throw new Error("Invalid project Id");
+  }
+
+  const project = await ProjectModel.findByIdAndDelete(projectId);
+
+  return project;
 };

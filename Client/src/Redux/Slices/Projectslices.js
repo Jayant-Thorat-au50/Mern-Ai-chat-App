@@ -4,14 +4,14 @@ import toast from "react-hot-toast";
 import { CatIcon } from "lucide-react";
 
 const initialState = {
- projectsList:[]
+  projectsList: [],
 };
 
 export const createProject = createAsyncThunk(
   "project/create",
   async (data) => {
     try {
-      const response = axiosinstace.post("/project/create", data , {
+      const response = axiosinstace.post("/project/create", data, {
         headers: {
           token: JSON.parse(localStorage.getItem("token")),
         },
@@ -32,22 +32,84 @@ export const createProject = createAsyncThunk(
     }
   }
 );
-export const getAllProjects = createAsyncThunk(
-  "project/getAll",
-  async () => {
+export const getAllProjects = createAsyncThunk("project/getAll", async () => {
+  try {
+    const response = axiosinstace.get("project/allProjects", {
+      headers: {
+        token: JSON.parse(localStorage.getItem("token")),
+      },
+    });
+
+    toast.promise(response, {
+      loading: "fetching all projects",
+      success: () => {
+        return "Projects fetched successfully!";
+      },
+      error: "Failed to get all project",
+    });
+
+    return (await response).data;
+  } catch (error) {
+    toast.error(error.response.data.message);
+    return error.response.data.message;
+  }
+});
+
+export const addUsersToProject = createAsyncThunk(
+  "project/add-users",
+  async (data) => {
+    console.log(data);
+
     try {
-      const response = axiosinstace.get("project/allProjects", {
-        headers:{
-          token:JSON.parse(localStorage.getItem('token'))
-        }
+      const response = axiosinstace.put("/project/addUsersInProject", data, {
+        headers: {
+          token: JSON.parse(localStorage.getItem("token")),
+        },
       });
 
       toast.promise(response, {
-        loading: "fetching all projects",
+        loading: " adding the users!",
         success: () => {
-          return "Projects fetched successfully!";
+          return "users added successfully!";
         },
-        error: "Failed to get all project",
+        error: "Failed to add the users",
+      });
+
+      console.log(response);
+
+      return (await response).data;
+    } catch (error) {
+      toast.error(error.response.data.message);
+      return error.response.data.message;
+    }
+  }
+);
+
+export const deleteProject = createAsyncThunk(
+  "project/deleteProject",
+  async (data) => {
+    try {
+      const response = axiosinstace.get("/project/get-project", data, {
+        headers: {
+          token: JSON.parse(localStorage.getItem("token")),
+        },
+      });
+
+      return (await response).data;
+    } catch (error) {
+      toast.error(error.response.data.message);
+      return error.response.data.message;
+    }
+  }
+);
+export const getProject = createAsyncThunk(
+  "project/getProject",
+  async (data) => {
+    try {
+      const response = axiosinstace.post(`/project/get-project/${data}`, data, {
+        headers: {
+          token: JSON.parse(localStorage.getItem("token")),
+        },
       });
 
       return (await response).data;
@@ -62,12 +124,11 @@ const projcetSlice = createSlice({
   name: "projects",
   initialState,
   reducers: {},
-  extraReducers:(builder) => {
-    builder
-    .addCase(getAllProjects.fulfilled, (state, action) => {
-      state.projectsList  = action.payload.projects
-    })
-  }
+  extraReducers: (builder) => {
+    builder.addCase(getAllProjects.fulfilled, (state, action) => {
+      state.projectsList = action.payload.projects;
+    });
+  },
 });
 
 export default projcetSlice.reducer;

@@ -5,6 +5,7 @@ import {
   createProject,
   getAllUsersProjects,
   getProjectdetails,
+  deleteProjectService
 } from "./services/projectsrvices.js";
 import mongoose from "mongoose";
 
@@ -39,53 +40,67 @@ export const getAllProjects = async (req, res) => {
 };
 
 export const addUsersToProject = async (req, res) => {
- try {
-  const { users, projectId } = req.body;
-  const { id } = req.user;
+  try {
+    const validate = validationResult(req.body);
 
-  console.log(users);
-  console.log(projectId);
-  console.log(id);
-  
+    if (!validate.isEmpty()) {
+      return res.status(400).json({ success: false, errors: validate.array() });
+    }
 
-  const project = await addUserInProject({
-    userId: id,
-    projectId: projectId,
-    users: users,
-  });
+    const { users, projectId } = req.body;
+    const { id } = req.user;
 
-  console.log(project);
-  
+    const project = await addUserInProject({
+      userId: id,
+      projectId: projectId,
+      users: users,
+    });
 
-  return res.status(200).json({
-    success: true,
-    project: project,
-  });
- } catch (error) {
-  return res.status(400).json({
-    success:false,
-    errors:error.message
-  })
- }
+    console.log(project);
+
+    return res.status(200).json({
+      success: true,
+      project: project,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      errors: error.message,
+    });
+  }
 };
 
 export const getProject = async (req, res) => {
-  
   try {
+    const { projectId } = req.params;
 
-  const {projectId} = req.body;
+    const project = await getProjectdetails({ projectId: projectId });
 
-    const project = await getProjectdetails({projectId:projectId})
-
-    res.status(200).json({
-      success:true,
-      project:project
+   return res.status(200).json({
+      success: true,
+      project: project,
     });
-    
   } catch (error) {
     return res.status(400).json({
-      success:false,
-      message:error.message
-    })
+      success: false,
+      message: error.message,
+    });
   }
-}
+};
+export const deleteProject = async (req, res) => {
+  try {
+    const { projectId } = req.body;
+
+    const project = await deleteProjectService({ projectId: projectId });
+
+    res.status(200).json({
+      success: true,
+      message: 'project deleted successfully',
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

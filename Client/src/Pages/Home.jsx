@@ -52,6 +52,7 @@ function Home() {
     }
   };
 
+  
 
 
   return (
@@ -90,10 +91,13 @@ function Home() {
     </header>
 
 
-      <div>
+      <div className=" w-full">
         {
           projects.map((project) => {
-            <h1 className=" text-black text-xl">{project.name}</h1>;
+            <div className=" flex items-center gap-2 justify-center">
+              <h1 className=" text-black text-xl">{project.name}</h1>;
+             <button className=" text-black">delete</button>
+            </div>
           })}
       </div>
 
@@ -111,12 +115,12 @@ function Home() {
 
       {/* projects List */}
 
-      <button
+      {isLoggedIn && <button
       onClick={() => setCreateProjectModal(true)}
       className=" border-2 flex items-center justify-between gap-2 w-44 border-blue-500 p-4">
        <span> Add project</span>
       <FaPlus/>
-      </button>
+      </button>}
 
       {isLoggedIn && <Projects/>}
 

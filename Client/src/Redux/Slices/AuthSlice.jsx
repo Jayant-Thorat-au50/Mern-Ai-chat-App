@@ -130,7 +130,9 @@ const AuthSlice = createSlice({
         localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
-        console.log(action);
+        console.log('executed');
+        console.log(action.payload);
+        
         state.AllUsersList = action.payload.allUsers
       })
       
