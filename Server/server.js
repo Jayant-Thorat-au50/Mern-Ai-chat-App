@@ -20,16 +20,18 @@ io.use((socket, next) => {
     const token = socket.handshake.headers.token;
 
     if (!token) {
-      return new Error("Authentication error");
+      return next(new Error("Authentication error"));
     }
 
     const decoded = JWT.verify(token, process.env.JWT_SECRET);
 
     if (!decoded) {
-      return new Error("Authentication error");
+      return next(new Error("Authentication error"));
     }
 
     socket.user = decoded;
+
+    console.log("next");
 
     next();
   } catch (error) {

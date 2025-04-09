@@ -7,6 +7,7 @@ import { FaPlus, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../Redux/Slices/AuthSlice";
 import { addUsersToProject, getProject } from "../Redux/Slices/Projectslices";
+import { initializeSocket } from "../Helpers/socketInstance.js";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -65,6 +66,7 @@ function ShowProject() {
   };
 
   useEffect(() => {
+    initializeSocket()
     getUpdatedProject(state._id);
     getAllUsersList();
   }, []);
