@@ -96,20 +96,18 @@ function ShowProject() {
             />
           </header>
 
-          <div className=" w-full">
-            {projectUtilsStates.project.users &&
-              projectUtilsStates.project.users.map((user) => (
-                <div
-                  key={user._id}
-                  className=" w-full bg-slate-300 flex gap-2 justify-start items-center py-2 px-4"
-                >
-                  <span className=" p-2 aspect-square bg-white">
-                    <FaUser className=" text-black" />
-                  </span>
-                  <p className=" text-xl text-black">{user.email}</p>
-                </div>
-              ))}
-          </div>
+          {projectUtilsStates.project.users &&
+            projectUtilsStates.project.users.map((user) => (
+              <div
+                key={user._id}
+                className=" w-full border border-black border-t-0 bg-slate-300 flex gap-2 justify-start items-center py-2 px-4"
+              >
+                <span className=" p-2 aspect-square bg-white">
+                  <FaUser className=" text-black" />
+                </span>
+                <p className=" text-lg text-black">{user.email}</p>
+              </div>
+            ))}
         </div>
 
         {/* header of the window */}
