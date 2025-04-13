@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "./Pages/Login.jsx";
 import Register from "./Pages/Register.jsx";
 import Home from "./Pages/Home.jsx";
-import LoginModal from "./Pages/loginModal.jsx";
+import LoginModal from "./Pages/LoginModal.jsx";
 import LoginModall from "./Pages/login2.jsx";
 import SignUpmodal from "./Pages/SignUpModal.jsx";
 import SuperAdminRequests from "./Pages/SuperAdminRequests.jsx";
