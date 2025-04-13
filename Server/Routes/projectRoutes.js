@@ -5,6 +5,7 @@ import {
   deleteProject,
   getAllProjects,
   getProject,
+  RemoveUsersFromProject,
 } from "../Controller/projectController.js";
 import { body } from "express-validator";
 import { jwtAuth } from "../Middlewares/jwtAuth.js";
@@ -26,6 +27,13 @@ projectsRoutes.put(
   body("projectId").isString().withMessage("Project ID is required"),
   jwtAuth,
   addUsersToProject
+);
+projectsRoutes.delete(
+  "/remove-users",
+  body("users").isArray().withMessage("Users are required"),
+  body("projectId").isString().withMessage("Project ID is required"),
+  jwtAuth,
+  RemoveUsersFromProject
 );
 
 projectsRoutes.post("/get-project/:projectId", jwtAuth, getProject);

@@ -3,7 +3,8 @@ import JWT from "jsonwebtoken";
 export const jwtAuth = async (req, res, next) => {
   const token = req.headers.token || req.body.token;
 
-
+  console.log(req.body)
+  
   
 
   if (!token) {

@@ -5,9 +5,9 @@ import {
   createProject,
   getAllUsersProjects,
   getProjectdetails,
-  deleteProjectService
+  deleteProjectService,
+  removeUsers,
 } from "./services/projectsrvices.js";
-import mongoose from "mongoose";
 
 export const createProjectController = async (req, res) => {
   const validate = validationResult(req.body);
@@ -56,8 +56,6 @@ export const addUsersToProject = async (req, res) => {
       users: users,
     });
 
-    console.log(project);
-
     return res.status(200).json({
       success: true,
       project: project,
@@ -76,7 +74,7 @@ export const getProject = async (req, res) => {
 
     const project = await getProjectdetails({ projectId: projectId });
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       project: project,
     });
@@ -95,12 +93,39 @@ export const deleteProject = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'project deleted successfully',
+      message: "project deleted successfully",
     });
   } catch (error) {
     return res.status(400).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+export const RemoveUsersFromProject = async (req, res) => {
+  try {
+    const validate = validationResult(req.body);
+
+    if (!validate.isEmpty()) {
+      return res.status(400).json({ success: false, errors: validate.array() });
+    }
+
+    const { users, projectId } = req.body;
+
+    const project = await removeUsers({
+      users: users,
+      projectId: projectId,
+    });
+
+    return res.status(200).json({
+      success: true,
+      project: project,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      errors: error.message,
     });
   }
 };

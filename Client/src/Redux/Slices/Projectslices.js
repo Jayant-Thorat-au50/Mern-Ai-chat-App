@@ -120,6 +120,26 @@ export const getProject = createAsyncThunk(
   }
 );
 
+export const removeUsersFromProjectthunck = createAsyncThunk(
+  "project/remove-users",
+  async (data) => {
+    console.log(data);
+
+    try {
+      const response = axiosinstace.delete("/project/remove-users", {
+        data,
+        headers: {
+          token: JSON.parse(localStorage.getItem("token")),
+        },
+      });
+
+      return (await response).data;
+    } catch (error) {
+      return error.response.data.message;
+    }
+  }
+);
+
 const projcetSlice = createSlice({
   name: "projects",
   initialState,

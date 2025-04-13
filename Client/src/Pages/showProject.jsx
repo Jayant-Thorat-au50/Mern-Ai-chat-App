@@ -6,8 +6,16 @@ import { IoMdClose } from "react-icons/io";
 import { FaPlus, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../Redux/Slices/AuthSlice";
-import { addUsersToProject, getProject } from "../Redux/Slices/Projectslices";
-import { initializeSocket } from "../Helpers/socketInstance.js";
+import {
+  addUsersToProject,
+  getProject,
+  removeUsersFromProjectthunck,
+} from "../Redux/Slices/Projectslices";
+import {
+  initializeSocket,
+  sendMsg,
+  receiveMsg,
+} from "../Helpers/socketInstance.js";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -16,23 +24,39 @@ function ShowProject() {
     addCollabModalOpen: false,
     selectedUsersIds: [],
     project: state,
+    message: "",
+    removeFromProjectModal: false,
   });
   const [selectedUsersIds, setSelectedUsersIds] = useState([]);
+  const [selectedUsersIdsRM, setSelectedUsersIdsRM] = useState([]);
 
   const dispacth = useDispatch();
-  let { AllUsersList } = useSelector((state) => state.authState);
+  let { AllUsersList } = useSelector((state) => state?.authState);
+  const { user } = useSelector((state) => state?.authState);
 
-  const usersToAdd = AllUsersList.filter((user) => {
+  const usersToAdd = AllUsersList?.filter((user) => {
     return !projectUtilsStates.project.users.some(
       (user1) => user1._id === user._id
     );
   });
+  const usersToRemove = projectUtilsStates.project.users.filter(
+    (u) => user._id !== u._id
+  );
 
   const getAllUsersList = async () => {
     await dispacth(getAllUsers());
   };
   const selectUserIds = async (userId) => {
     setSelectedUsersIds((prev) => {
+      if (prev.includes(userId)) {
+        return prev.filter((id) => id !== userId);
+      } else {
+        return [...prev, userId];
+      }
+    });
+  };
+  const selectUserIdsRemove = async (userId) => {
+    setSelectedUsersIdsRM((prev) => {
       if (prev.includes(userId)) {
         return prev.filter((id) => id !== userId);
       } else {
@@ -55,6 +79,28 @@ function ShowProject() {
     }
   };
 
+  const handleRemoveUsers = async () => {
+    const result = window.confirm("Are you sure to remove these users");
+
+    if (!result) return;
+    const response = await dispacth(
+      removeUsersFromProjectthunck({
+        projectId: projectUtilsStates.project._id,
+        users: selectedUsersIdsRM,
+      })
+    );
+    console.log(response);
+
+    if (response.payload.success) {
+      getUpdatedProject(projectUtilsStates.project._id);
+      setProjectUtilsStates((prev) => ({
+        ...prev,
+        removeFromProjectModal: false,
+      }));
+      setSelectedUsersIdsRM([]);
+    }
+  };
+
   const getUpdatedProject = async (id) => {
     const response = await dispacth(getProject(id));
     if (response.payload.success) {
@@ -65,8 +111,12 @@ function ShowProject() {
     }
   };
 
+  const send = () => {
+    sendMsg("project-message", { message, sender: user._id });
+  };
+
   useEffect(() => {
-    initializeSocket()
+    initializeSocket(projectUtilsStates.project._id);
     getUpdatedProject(state._id);
     getAllUsersList();
   }, []);
@@ -127,6 +177,16 @@ function ShowProject() {
             >
               Add collaborators
             </button>
+            <button
+              onClick={() => {
+                setProjectUtilsStates((prev) => ({
+                  ...prev,
+                  removeFromProjectModal: true,
+                }));
+              }}
+            >
+              remove
+            </button>
             <span className=" border-2 p-1 rounded-full">
               {projectUtilsStates.project.users.length}
             </span>
@@ -163,14 +223,21 @@ function ShowProject() {
         </div>
 
         {/* messages input */}
-        <div className="mt-4 gap-2 mx-2 flex">
+        <div className="mt-4 gap-1 mx-0.5 flex">
           <input
             type="text"
+            value={projectUtilsStates.message}
+            onChange={(e) =>
+              setProjectUtilsStates((prev) => ({
+                ...prev,
+                message: e.target.value,
+              }))
+            }
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Type a message..."
           />
-          <button className=" p-4 border-2 rounded border-white">
-            <FiSend className=" text-md" />
+          <button className=" p-3 hover:bg-gray-500  border-2 rounded border-white">
+            <FiSend className="  text-lg" />
           </button>
         </div>
       </section>
@@ -232,7 +299,7 @@ function ShowProject() {
 
               {/* button to select the users */}
             </div>
-            <div className=" w-full flex justify-center items-center py-2">
+            <div className=" w-full flex justify-center items-center px-2 gap-2 py-2">
               <button
                 onClick={handleAddUsers}
                 type="button"
@@ -240,6 +307,70 @@ function ShowProject() {
                 className=" w-1/2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
               >
                 Add Users
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* remove collaborators modal */}
+      {projectUtilsStates.removeFromProjectModal && (
+        <div className="fixed inset-0 flex items-center  justify-center bg-black/50 backdrop-blur-md p-4">
+          <section className="   w-3/12 bg-white rounded-md">
+            {/* users list header */}
+            <header className=" p-2 text-center border-2  w-full rounded-lg flex justify-between items-center">
+              <h2 className=" font-semibold flex-grow text-xl ">
+                Select users
+              </h2>
+              <p
+                type="button"
+                onClick={() => {
+                  setSelectedUsersIds([]);
+                  setProjectUtilsStates((prev) => ({
+                    ...prev,
+                    removeFromProjectModal: false,
+                  }));
+                }}
+                className=" w-1/12 "
+              >
+                <IoMdClose className=" text-2xl text-gray-600 hover:text-black" />
+              </p>
+            </header>
+
+            {/* userList */}
+
+            <div className="usersList py-1 max-h-80 overflow-y-auto">
+              {usersToRemove &&
+                usersToRemove.map((user) => (
+                  <div
+                    onClick={() => selectUserIdsRemove(user._id)}
+                    key={user._id}
+                    type="button"
+                    className=" border-2  px-4 py-2 hover:bg-gray-300 border-t-0 flex justify-between items-center"
+                  >
+                    <span className=" border-2 rounded-full p-1 border-black">
+                      {<FaUser />}
+                    </span>
+                    <p className=" flex-grow px-4">{user.email}</p>
+                    <input
+                      type="checkbox"
+                      checked={selectedUsersIdsRM.includes(user._id)}
+                      onChange={() => {}}
+                      className="w-5 h-5"
+                    />
+                  </div>
+                ))}
+
+              {/* button to select the users */}
+            </div>
+            <div className=" w-full flex justify-center items-center px-2 gap-2 py-2">
+              <button
+                onClick={handleRemoveUsers}
+                type="button"
+                disabled={setSelectedUsersIdsRM.length === 0}
+                className=" w-1/2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
+              >
+                Remove Users
               </button>
             </div>
           </section>

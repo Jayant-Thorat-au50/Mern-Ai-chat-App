@@ -90,3 +90,21 @@ export const deleteProjectService = async ({ projectId }) => {
 
   return project;
 };
+
+export const removeUsers = async ({users, projectId}) => {
+  if (!projectId) {
+    throw new Error("project Id is required");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(projectId)) {
+    throw new Error("Invalid project Id");
+  }
+
+  const project = await ProjectModel.findOneAndUpdate(
+    { _id: projectId },
+    { $pull: { users: { $in: users } } },
+    { new: true }
+  );
+
+  return project;
+}

@@ -184,7 +184,7 @@ export const getAllUsers = async (req, res) => {
       allUsers: Allusers,
     });
   } catch (error) {
-    res.status(400).json({
+     return res.status(400).json({
       success: false,
       message: error.message,
     });

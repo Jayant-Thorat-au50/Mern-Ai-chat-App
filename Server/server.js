@@ -4,6 +4,8 @@ import http from "http";
 import app from "./app.js";
 import { Server } from "socket.io";
 import JWT from "jsonwebtoken";
+import mongoose from "mongoose";
+import ProjectModel from "./Models/ProjectModel.js";
 
 const port = process.env.port;
 
@@ -15,9 +17,21 @@ const io = new Server(server, {
   },
 });
 
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   try {
-    const token = socket.handshake.headers.token;
+    const token = socket.handshake.auth.token;
+
+    const projectId = socket.handshake.query.projectId;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return new Error("Invalid project Id");
+    }
+
+    const project = await ProjectModel.findById(projectId);
+
+    if (!project) {
+      return new Error("project does not exists");
+    }
 
     if (!token) {
       return next(new Error("Authentication error"));
@@ -30,20 +44,29 @@ io.use((socket, next) => {
     }
 
     socket.user = decoded;
-
-    console.log("next");
-
+    socket.project = project;
     next();
   } catch (error) {
-    next(error);
+    next(new Error("error", error));
   }
 });
 
 io.on("connection", (socket) => {
-  console.log(`a user is connected to socket`);
+  socket.join(socket.project._id);
 
-  socket.on("event", (data) => {});
-  socket.on("disconnect", () => {});
+  socket.on("project-message", (data) => {
+    socket.broadcast.to(socket.project._id).emit("project-message", data);
+  });
+
+  console.log('a user connected');
+  
+
+  socket.on("event", (data) => {
+    /* … */
+  });
+  socket.on("disconnect", () => {
+    /* … */
+  });
 });
 
 server.listen(port, () => {
