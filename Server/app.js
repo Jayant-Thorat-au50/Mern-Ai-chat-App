@@ -13,7 +13,7 @@ import projectsRoutes from "./Routes/projectRoutes.js";
 const app = express();
 
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin:'http://chatjay23.netlify.app',
     credentials:true,
 }))
 app.use(morgan('dev'))
