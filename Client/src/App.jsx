@@ -11,7 +11,7 @@ import HeroSectionLMS from "./Pages/HeroSectionLMS.jsx";
 import Projects from "./Pages/Projects.jsx";
 import ShowProject from "./Pages/showProject.jsx";
 import ShowProjectGPT from "./Pages/showProjectGPT.jsx";
-import UserAuth from "./Helpers/userAuth.jsx";
+import UserAuth from "./Helpers/UserAuth.jsx";
 
 
 function App() {
