@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../Redux/Slices/AuthSlice";
 import { IoMdClose } from "react-icons/io";
@@ -34,23 +34,18 @@ const LoginModall = () => {
       return;
     }
 
-    
     setIsSubmitting(true);
     const response = await dispatch(login(userData));
-    console.log(response);
-    
-    if (response.payload.success) {
+
+    if (response?.payload?.success) {
       setUserData({
         email: "",
         password: "",
       });
       navigate("/");
-    } else {
-      setIsSubmitting(false);
-    }
+    } else setIsSubmitting(false);
+    
   };
-
-  console.log(userData);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -65,8 +60,9 @@ const LoginModall = () => {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all">
         <div className="relative p-6">
           <button
-          onClick={() => navigate(-1)}
-          className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 transition-colors">
+            onClick={() => navigate(-1)}
+            className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 transition-colors"
+          >
             <IoMdClose className=" text-2xl" />
           </button>
 

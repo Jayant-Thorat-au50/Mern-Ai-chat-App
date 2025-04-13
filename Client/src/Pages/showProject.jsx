@@ -16,6 +16,7 @@ import {
   sendMsg,
   receiveMsg,
 } from "../Helpers/socketInstance.js";
+import { Socket } from "socket.io-client";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -79,25 +80,42 @@ function ShowProject() {
     }
   };
 
-  const handleRemoveUsers = async () => {
+  const handleRemoveUsers = async (singleuser) => {
     const result = window.confirm("Are you sure to remove these users");
 
     if (!result) return;
-    const response = await dispacth(
-      removeUsersFromProjectthunck({
-        projectId: projectUtilsStates.project._id,
-        users: selectedUsersIdsRM,
-      })
-    );
-    console.log(response);
+    if (selectedUsersIdsRM.length > 0) {
+      const response = await dispacth(
+        removeUsersFromProjectthunck({
+          projectId: projectUtilsStates.project._id,
+          users: selectedUsersIdsRM,
+        })
+      );
 
-    if (response.payload.success) {
-      getUpdatedProject(projectUtilsStates.project._id);
-      setProjectUtilsStates((prev) => ({
-        ...prev,
-        removeFromProjectModal: false,
-      }));
-      setSelectedUsersIdsRM([]);
+      if (response.payload.success) {
+        getUpdatedProject(projectUtilsStates.project._id);
+        setProjectUtilsStates((prev) => ({
+          ...prev,
+          removeFromProjectModal: false,
+        }));
+        setSelectedUsersIdsRM([]);
+      }
+    } else {
+      const response = await dispacth(
+        removeUsersFromProjectthunck({
+          projectId: projectUtilsStates.project._id,
+          users: [singleuser],
+        })
+      );
+
+      if (response.payload.success) {
+        getUpdatedProject(projectUtilsStates.project._id);
+        setProjectUtilsStates((prev) => ({
+          ...prev,
+          removeFromProjectModal: false,
+        }));
+        setSelectedUsersIdsRM([]);
+      }
     }
   };
 
@@ -112,11 +130,12 @@ function ShowProject() {
   };
 
   const send = () => {
-    sendMsg("project-message", { message, sender: user._id });
+    sendMsg("project-message", {message:projectUtilsStates.message, sender: user._id });
   };
 
   useEffect(() => {
-    initializeSocket(projectUtilsStates.project._id);
+   initializeSocket(projectUtilsStates.project._id)
+    
     getUpdatedProject(state._id);
     getAllUsersList();
   }, []);
@@ -134,7 +153,7 @@ function ShowProject() {
           }
         >
           <header className=" flex items-center bg-white justify-end w-full px-5 py-2">
-            <h2 className=" text-black text-center flex-grow">
+            <h2 className=" text-black text-lg font-bold text-center flex-grow">
               {projectUtilsStates.project.name}
             </h2>
             <IoMdClose
@@ -148,16 +167,37 @@ function ShowProject() {
             />
           </header>
 
+          <div className=" w-full border border-black border-t-0 bg-slate-300 flex gap-2 justify-start items-center py-2 px-4">
+            <div className=" w-full flex gap-3 items-center">
+              <span className=" p-2 aspect-square bg-white">
+                <FaUser className=" text-black" />
+              </span>
+              <p className=" font-semibold text-sm text-black">{user.email}</p>
+              <span className=" text-sm font-semiboldn text-gray-600">you</span>
+            </div>
+          </div>
+
           {projectUtilsStates.project.users &&
-            projectUtilsStates.project.users.map((user) => (
+            usersToRemove.map((user) => (
               <div
                 key={user._id}
                 className=" w-full border border-black border-t-0 bg-slate-300 flex gap-2 justify-start items-center py-2 px-4"
               >
-                <span className=" p-2 aspect-square bg-white">
-                  <FaUser className=" text-black" />
-                </span>
-                <p className=" text-lg text-black">{user.email}</p>
+                <div className=" w-full flex gap-3 items-center">
+                  <span className=" p-2 aspect-square bg-white">
+                    <FaUser className=" text-black" />
+                  </span>
+                  <p className=" font-semibold text-sm text-black">
+                    {user.email}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleRemoveUsers(user._id)}
+                  type="button"
+                  className=" text-black text-sm bg-slate-400 border px-2 py-1 rounded"
+                >
+                  remove
+                </button>
               </div>
             ))}
         </div>
@@ -179,10 +219,15 @@ function ShowProject() {
             </button>
             <button
               onClick={() => {
-                setProjectUtilsStates((prev) => ({
-                  ...prev,
-                  removeFromProjectModal: true,
-                }));
+                if(projectUtilsStates.project.users.length > 1) {
+                  setProjectUtilsStates((prev) => ({
+                    ...prev,
+                    removeFromProjectModal: true,
+                  }));
+                }
+                else {
+                  alert("You are the only user in this project. You cannot remove yourself.");
+                }
               }}
             >
               remove
@@ -236,7 +281,9 @@ function ShowProject() {
             className="w-full p-2 rounded bg-gray-700 text-white"
             placeholder="Type a message..."
           />
-          <button className=" p-3 hover:bg-gray-500  border-2 rounded border-white">
+          <button
+          onClick={send}
+          className=" p-3 hover:bg-gray-500  border-2 rounded border-white">
             <FiSend className="  text-lg" />
           </button>
         </div>

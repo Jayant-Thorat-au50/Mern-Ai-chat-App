@@ -54,11 +54,13 @@ io.use(async (socket, next) => {
 io.on("connection", (socket) => {
   socket.join(socket.project._id);
 
+  console.log('a user connected');
+  
   socket.on("project-message", (data) => {
+
     socket.broadcast.to(socket.project._id).emit("project-message", data);
   });
 
-  console.log('a user connected');
   
 
   socket.on("event", (data) => {

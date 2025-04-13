@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteAllusers, getProfile, logout } from "../Redux/Slices/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import {FaPlus} from 'react-icons/fa'
+import { FaPlus } from "react-icons/fa";
 import { createProject, getAllProjects } from "../Redux/Slices/Projectslices";
 import axiosInstance from "../Helpers/AxiosInstance";
 import Projects from "../component/projects";
@@ -13,7 +13,7 @@ function Home() {
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem("user"));
   const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedIn"));
-  const projects = useSelector(state => state.projectstate.projectsList)
+  const projects = useSelector((state) => state.projectstate.projectsList);
 
   const [newProject, setNewProject] = useState({
     name: "",
@@ -52,56 +52,47 @@ function Home() {
     }
   };
 
-  
-
-
   return (
     <>
-
-    <header className=" flex justify-between items-center bg-gray-800 text-white p-4">
-
-      <div className=" flex gap-5">
-        <div>Home</div>
-        <button onClick={deleteAllusersfromCo}>delete</button>
-        {isLoggedIn ? (
-          <button onClick={handlelogout}>logout</button>
-        ) : (
-          <button
-            onClick={() => {
-              navigate("/loginModall");
-            }}
-          >
-            login
-          </button>
-        )}
-      </div>
-      <div className="flex flex-col gap-5 w-1/2">
-        {userData && (
-          <input
-            type="text"
-            className=" w-full"
-            onChange={() => {}}
-            value={userData.email}
-          />
-        )}
-      </div>
-      <div>
-        {isLoggedIn && <button onClick={handlegetProfile}>get user</button>}
-      </div>
-    </header>
-
+      <header className=" flex justify-between items-center bg-gray-800 text-white p-4">
+        <div className=" flex gap-5">
+          <div>Home</div>
+          <button onClick={deleteAllusersfromCo}>delete</button>
+          {isLoggedIn ? (
+            <button onClick={handlelogout}>logout</button>
+          ) : (
+            <button
+              onClick={() => {
+                navigate("/loginModall");
+              }}
+            >
+              login
+            </button>
+          )}
+        </div>
+        <div className="flex flex-col gap-5 w-1/2">
+          {userData && (
+            <input
+              type="text"
+              className=" w-full"
+              onChange={() => {}}
+              value={userData.email}
+            />
+          )}
+        </div>
+        <div>
+          {isLoggedIn && <button onClick={handlegetProfile}>get user</button>}
+        </div>
+      </header>
 
       <div className=" w-full">
-        {
-          projects.map((project) => {
-            <div className=" flex items-center gap-2 justify-center">
-              <h1 className=" text-black text-xl">{project.name}</h1>;
-             <button className=" text-black">delete</button>
-            </div>
-          })}
+        {projects.map((project) => {
+          <div className=" flex items-center gap-2 justify-center">
+            <h1 className=" text-black text-xl">{project.name}</h1>;
+            <button className=" text-black">delete</button>
+          </div>;
+        })}
       </div>
-
-
 
       <div className=" flex flex-col">
         {isLoggedIn && (
@@ -109,22 +100,22 @@ function Home() {
             create project
           </button>
         )}
-
-       
       </div>
 
       {/* projects List */}
 
-      {isLoggedIn && <button
-      onClick={() => setCreateProjectModal(true)}
-      className=" border-2 flex items-center justify-between gap-2 w-44 border-blue-500 p-4">
-       <span> Add project</span>
-      <FaPlus/>
-      </button>}
+      {isLoggedIn && (
+        <button
+          onClick={() => setCreateProjectModal(true)}
+          className=" border-2 flex items-center justify-between gap-2 w-44 border-blue-500 p-4"
+        >
+          <span> Add project</span>
+          <FaPlus />
+        </button>
+      )}
 
-      {isLoggedIn && <Projects/>}
+      {isLoggedIn && <Projects />}
 
-      
       {/* create project modal */}
 
       {createProjectModalOpen && (

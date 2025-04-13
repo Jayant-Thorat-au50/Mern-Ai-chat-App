@@ -17,10 +17,12 @@ function UserAuth({ children }) {
     }
   }, []);
 
+  
+
   return (
     <>
       {loading ? (
-        <div className="flex justify-center items-center h-screen w-screen bg-gray-100 text-black">
+        <div className="flex justify-center items-center h-screen text-2xl w-screen bg-gray-100 text-black">
           Loading...
         </div>
       ) : (

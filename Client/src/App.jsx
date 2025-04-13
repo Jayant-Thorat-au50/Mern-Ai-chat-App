@@ -6,8 +6,6 @@ import Home from "./Pages/Home.jsx";
 import LoginModal from "./Pages/loginModal.jsx";
 import LoginModall from "./Pages/login2.jsx";
 import SignUpmodal from "./Pages/SignUpModal.jsx";
-import HeroSection from "./component/Hero.jsx";
-import AdminRequests from "./Pages/SuperAdminRequests.jsx";
 import SuperAdminRequests from "./Pages/SuperAdminRequests.jsx";
 import HeroSectionLMS from "./Pages/HeroSectionLMS.jsx";
 import Projects from "./Pages/Projects.jsx";
