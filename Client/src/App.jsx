@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Login from "./Pages/Login.jsx";
 import Register from "./Pages/Register.jsx";
 import Home from "./Pages/Home.jsx";
@@ -12,6 +12,7 @@ import Projects from "./Pages/Projects.jsx";
 import ShowProject from "./Pages/showProject.jsx";
 import ShowProjectGPT from "./Pages/showProjectGPT.jsx";
 import UserAuth from "./Helpers/userAuth.jsx";
+
 
 function App() {
   return (
