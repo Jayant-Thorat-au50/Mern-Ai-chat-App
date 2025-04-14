@@ -130,12 +130,16 @@ function ShowProject() {
   };
 
   const send = () => {
-    sendMsg("project-message", {message:projectUtilsStates.message, sender: user._id });
+    sendMsg("project-message", {
+      message: projectUtilsStates.message,
+      sender: user._id,
+    });
+    setProjectUtilsStates((prev) => ({ ...prev, message: "" }));
   };
 
   useEffect(() => {
-   initializeSocket(projectUtilsStates.project._id)
-    
+    initializeSocket(projectUtilsStates.project._id);
+
     getUpdatedProject(state._id);
     getAllUsersList();
   }, []);
@@ -219,14 +223,15 @@ function ShowProject() {
             </button>
             <button
               onClick={() => {
-                if(projectUtilsStates.project.users.length > 1) {
+                if (projectUtilsStates.project.users.length > 1) {
                   setProjectUtilsStates((prev) => ({
                     ...prev,
                     removeFromProjectModal: true,
                   }));
-                }
-                else {
-                  alert("You are the only user in this project. You cannot remove yourself.");
+                } else {
+                  alert(
+                    "You are the only user in this project. You cannot remove yourself."
+                  );
                 }
               }}
             >
@@ -282,9 +287,10 @@ function ShowProject() {
             placeholder="Type a message..."
           />
           <button
-          onClick={send}
-          className=" p-3 hover:bg-gray-500  border-2 rounded border-white">
-            <FiSend className="  text-lg" />
+            onClick={send}
+            className=" p-3 hover:bg-gray-500  border-2 rounded border-white"
+          >
+            <FiSend className="text-lg" />
           </button>
         </div>
       </section>

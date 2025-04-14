@@ -1,10 +1,8 @@
 import UserModel from "../Models/UserModel.js";
 import { validationResult } from "express-validator";
-import * as userServices from "./services/user.services.js";
 import bcrypt from "bcrypt";
 import emailValidate from "email-validator";
 import ProjectModel from "../Models/ProjectModel.js";
-// import redisClient from "./services/redisServices.js";
 
 export const signUpController = async (req, res, next) => {
   const { email, password } = req.body;
@@ -184,7 +182,7 @@ export const getAllUsers = async (req, res) => {
       allUsers: Allusers,
     });
   } catch (error) {
-     return res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
