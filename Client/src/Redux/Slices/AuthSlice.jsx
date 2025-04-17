@@ -7,7 +7,7 @@ const initialState = {
   isLoggedIn: localStorage.getItem("isLoggedIn") || null,
   token: localStorage.getItem("token") || null,
   role: "",
-  AllUsersList:[]
+  AllUsersList: [],
 };
 
 export const signUp = createAsyncThunk("/user/register", async (data) => {
@@ -65,7 +65,7 @@ export const getProfile = createAsyncThunk("/user/get-profile", async () => {
     const response = await axiosInstance.get("/user/getUser", {
       headers: {
         token: JSON.parse(localStorage.getItem("token")),
-      }
+      },
     });
 
     return response.data;
@@ -87,19 +87,19 @@ export const logout = createAsyncThunk("/user/logout", async () => {
   }
 });
 
-export const getAllUsers = createAsyncThunk('/users/all', async () => {
+export const getAllUsers = createAsyncThunk("/users/all", async () => {
   try {
-      const response = await axiosInstance.get('/user/allUsers' , {
-        headers:{
-          token:JSON.parse(localStorage.getItem('token'))
-        }
-      });
-      return response.data;
+    const response = await axiosInstance.get("/user/allUsers", {
+      headers: {
+        token: JSON.parse(localStorage.getItem("token")),
+      },
+    });
+    return response.data;
   } catch (error) {
     toast.error(error.response.data.message);
     return error.response.data.message;
   }
-})
+});
 
 const AuthSlice = createSlice({
   name: "auth",
@@ -121,21 +121,16 @@ const AuthSlice = createSlice({
         localStorage.setItem("token", JSON.stringify(action.payload.token));
         localStorage.setItem("isLoggedIn", true);
       })
-      .addCase(logout.fulfilled, (state, action) => {
+      .addCase(logout.fulfilled, () => {
         localStorage.clear();
-        console.log(action.payload);
       })
       .addCase(getProfile.fulfilled, (state, action) => {
         state.user = action.payload.user;
         localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
-        console.log('executed');
-        console.log(action.payload);
-        
-        state.AllUsersList = action.payload.allUsers
-      })
-      
+        state.AllUsersList = action.payload.allUsers;
+      });
   },
 });
 

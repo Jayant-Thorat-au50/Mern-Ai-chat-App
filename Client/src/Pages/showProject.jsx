@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FiSend } from "react-icons/fi";
-import { useLocation } from "react-router-dom";
+import { data, useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
 import { FaPlus, FaUser } from "react-icons/fa";
@@ -16,7 +16,6 @@ import {
   sendMsg,
   receiveMsg,
 } from "../Helpers/socketInstance.js";
-import { Socket } from "socket.io-client";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -142,6 +141,10 @@ function ShowProject() {
 
     getUpdatedProject(state._id);
     getAllUsersList();
+    receiveMsg('project-message', data => {
+      console.log(data);
+      
+    })
   }, []);
 
   return (

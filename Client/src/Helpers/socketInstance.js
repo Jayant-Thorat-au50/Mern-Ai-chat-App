@@ -16,8 +16,12 @@ export const initializeSocket = (projectId) => {
 };
 
 export const sendMsg = (eventName, data) => {
-  if(!socketInstance && !socketInstance.connected) return;
-  socketInstance.emit(eventName, data);
+  if(socketInstance && socketInstance.connected){
+
+    socketInstance.emit(eventName, data);
+  }else{
+    alert('no connection')
+  }
 };
 export const receiveMsg = (eventName, cb) => {
   socketInstance.on(eventName, cb);
