@@ -143,6 +143,8 @@ function ShowProject() {
   };
 
   const appendIncomingMessage = (message) => {
+
+    // incoming message from other users
     const messageBox = document.querySelector(".chat");
 
     const newMessage = document.createElement("div");
@@ -156,6 +158,8 @@ function ShowProject() {
     messageBox.appendChild(newMessage);
   };
   const appendOutgoingMessage = (message) => {
+
+    // outgoing message from the user
     const messageBox = document.querySelector(".chat");
 
     const newMessage = document.createElement("div");
@@ -243,9 +247,6 @@ function ShowProject() {
         </div>
 
         {/* header of the window */}
-
-        
-
         <header className=" py-2 flex justify-between  items-center px-5 bg-slate-400 w-full">
           <div className=" flex gap-2 items-center border-black px-2 border py-1 rounded-md ">
             <FaPlus />
