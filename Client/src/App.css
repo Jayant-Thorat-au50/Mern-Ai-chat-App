@@ -1,0 +1,8 @@
+.chat::-webkit-scrollbar{
+    display: none;
+    background-color: #e80505;
+}
+
+.chat{
+    scroll-behavior: smooth;
+}

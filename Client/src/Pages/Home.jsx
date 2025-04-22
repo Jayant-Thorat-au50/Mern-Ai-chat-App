@@ -7,6 +7,7 @@ import { FaPlus } from "react-icons/fa";
 import { createProject, getAllProjects } from "../Redux/Slices/Projectslices";
 import Projects from "../component/projects.jsx";
 
+
 function Home() {
   const dispacth = useDispatch();
   const navigate = useNavigate();

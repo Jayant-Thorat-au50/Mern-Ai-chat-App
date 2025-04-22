@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FiSend } from "react-icons/fi";
-import { data, useLocation } from "react-router-dom";
+import {  useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
 import { FaPlus, FaUser } from "react-icons/fa";
@@ -16,6 +16,7 @@ import {
   sendMsg,
   receiveMsg,
 } from "../Helpers/socketInstance.js";
+import '../../src/App.css'
 
 function ShowProject() {
   const { state } = useLocation();
@@ -30,11 +31,13 @@ function ShowProject() {
   const [selectedUsersIds, setSelectedUsersIds] = useState([]);
   const [selectedUsersIdsRM, setSelectedUsersIdsRM] = useState([]);
 
+  const messageBox =React.createRef()
+
   const dispacth = useDispatch();
   let { AllUsersList } = useSelector((state) => state?.authState);
   const { user } = useSelector((state) => state?.authState);
 
-  const usersToAdd = AllUsersList?.filter((user) => {
+  const usersToAdd = AllUsersList?.filter(user => {
     return !projectUtilsStates.project.users.some(
       (user1) => user1._id === user._id
     );
@@ -156,6 +159,7 @@ function ShowProject() {
     `;
 
     messageBox.appendChild(newMessage);
+    scrollToBottom()
   };
   const appendOutgoingMessage = (message) => {
 
@@ -164,14 +168,19 @@ function ShowProject() {
 
     const newMessage = document.createElement("div");
     newMessage.className =
-      "  text-wrap break-words w-9/12 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-md text-black";
+      "  text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-md text-black";
     newMessage.innerHTML = `
       <p class=" text-xs">${user.email}</p>
       <p class=" font-semibold">${message.message}</p>
     `;
 
     messageBox.appendChild(newMessage);
+    scrollToBottom()
   };
+
+  const scrollToBottom = () => {
+         messageBox.current.scrollTop =messageBox.current.scrollHeight
+  }
 
   useEffect(() => {
     initializeSocket(projectUtilsStates.project._id);
@@ -187,7 +196,7 @@ function ShowProject() {
   return (
     <div className="flex h-screen w-screen">
       {/* left side of the project chat window */}
-      <section className=" relative w-3/12 bg-gray-800 text-white pt-0 pb-1 flex flex-col">
+      <section className=" relative w-3/12  bg-gray-800 text-white pt-0 pb-1 flex flex-col">
         {/* users list in project (side panel) */}
         <div
           className={
@@ -294,7 +303,7 @@ function ShowProject() {
         </header>
 
         {/* messages list conversation area */}
-        <div className="flex-1 chat overflow-y-auto  w-full flex-wrap py-2 gap-5 px-0"></div>
+        <div ref={messageBox} className="flex-1 chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"></div>
              
         {/* messages input */}
         <div className="mt-4 gap-1 mx-0.5 flex">
@@ -307,7 +316,7 @@ function ShowProject() {
                 message: e.target.value,
               }))
             }
-            className="w-full p-2 rounded bg-gray-700 text-white"
+            className="w-full focus:border-none p-2 rounded bg-gray-700 text-white"
             placeholder="Type a message..."
           />
           <button
