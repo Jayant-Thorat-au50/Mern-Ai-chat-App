@@ -200,6 +200,7 @@ function ShowProject() {
             <h2 className=" text-black text-lg font-bold text-center flex-grow">
               {projectUtilsStates.project.name}
             </h2>
+            <div className=" border border-gray-400 hover:border-gray-700 p-0 rounded-full">
             <IoMdClose
               onClick={() =>
                 setProjectUtilsStates((prev) => ({
@@ -209,6 +210,7 @@ function ShowProject() {
               }
               className=" text-gray-500 hover:text-black transition-all ease-in-out duration-200 p-1 border-gray-800 text-4xl"
             />
+            </div>
           </header>
 
           <div className=" w-full border border-black border-t-0 bg-slate-300 flex gap-2 justify-start items-center py-2 px-4">
