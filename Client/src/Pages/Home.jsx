@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
 import { createProject, getAllProjects } from "../Redux/Slices/Projectslices";
-import axiosInstance from "../Helpers/AxiosInstance";
-import Projects from "../component/projects";
+import Projects from "../component/projects.jsx";
 
 function Home() {
   const dispacth = useDispatch();
@@ -14,6 +13,7 @@ function Home() {
   const userData = JSON.parse(localStorage.getItem("user"));
   const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedIn"));
   const projects = useSelector((state) => state.projectstate.projectsList);
+
 
   const [newProject, setNewProject] = useState({
     name: "",
@@ -73,8 +73,8 @@ function Home() {
         <div className="flex flex-col gap-5 w-1/2">
           {userData && (
             <input
-              type="text"
-              className=" w-full"
+              type="text "
+              className=" w-full text-black "
               onChange={() => {}}
               value={userData.email}
             />

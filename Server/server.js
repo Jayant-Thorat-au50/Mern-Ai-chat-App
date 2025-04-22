@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import JWT from "jsonwebtoken";
 import mongoose from "mongoose";
 import ProjectModel from "./Models/ProjectModel.js";
+import UserModel from "./Models/UserModel.js";
 
 const port = process.env.port;
 
@@ -58,13 +59,27 @@ io.on("connection", (socket) => {
 
   socket.join(socket.roomId)
 
-  socket.on("project-message", (data) => {
-    console.log(data);
+  socket.on("project-message", async (data) => {
+    console.log(data.sender);
 
-    socket.broadcast.to(socket.roomId).emit("project-message", data);
+    const user = await UserModel.findById(data.sender);
+    if (!user) {
+      return new Error("user does not exists");
+    }
+  
+    if (!socket.project) {
+      return new Error("project does not exists");
+    }
+
+    const dataToSend = {
+      sender: user.email,
+      message: data.message,
+    };
+
+    socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);
   });
 
-  socket.on("event", data => {/* … */});
+  socket.on("event", dataToSend => {/* … */});
   socket.on("disconnect", () => {/* … */});
 });
 

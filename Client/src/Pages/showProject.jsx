@@ -129,11 +129,44 @@ function ShowProject() {
   };
 
   const send = () => {
+    if(projectUtilsStates.message.trim() === "") return;
     sendMsg("project-message", {
       message: projectUtilsStates.message,
       sender: user._id,
     });
     setProjectUtilsStates((prev) => ({ ...prev, message: "" }));
+    const data = {
+      message: projectUtilsStates.message,
+      sender: user._id,
+    };
+    appendOutgoingMessage(data);
+  };
+
+  const appendIncomingMessage = (message) => {
+    const messageBox = document.querySelector(".chat");
+
+    const newMessage = document.createElement("div");
+    newMessage.className =
+      "text-wrap break-words w-9/12 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-md text-black";
+    newMessage.innerHTML = `
+      <p class=" text-xs">${message.sender}</p>
+      <p class=" font-semibold">${message.message}</p>
+    `;
+
+    messageBox.appendChild(newMessage);
+  };
+  const appendOutgoingMessage = (message) => {
+    const messageBox = document.querySelector(".chat");
+
+    const newMessage = document.createElement("div");
+    newMessage.className =
+      "  text-wrap break-words w-9/12 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-md text-black";
+    newMessage.innerHTML = `
+      <p class=" text-xs">${user.email}</p>
+      <p class=" font-semibold">${message.message}</p>
+    `;
+
+    messageBox.appendChild(newMessage);
   };
 
   useEffect(() => {
@@ -141,10 +174,10 @@ function ShowProject() {
 
     getUpdatedProject(state._id);
     getAllUsersList();
-    receiveMsg('project-message', data => {
+    receiveMsg("project-message", (data) => {
       console.log(data);
-      
-    })
+      appendIncomingMessage(data);
+    });
   }, []);
 
   return (
@@ -211,7 +244,9 @@ function ShowProject() {
 
         {/* header of the window */}
 
-        <header className=" py-2 flex justify-between items-center px-5 bg-slate-400 w-full">
+        
+
+        <header className=" py-2 flex justify-between  items-center px-5 bg-slate-400 w-full">
           <div className=" flex gap-2 items-center border-black px-2 border py-1 rounded-md ">
             <FaPlus />
             <button
@@ -256,25 +291,8 @@ function ShowProject() {
         </header>
 
         {/* messages list conversation area */}
-        <div className="flex-1 overflow-y-auto py-2 px-0">
-          {/* incoming message */}
-          <div className="chat w-9/12 bg-gray-100 mb-0.5 p-1  mr-0.5 rounded-md text-black">
-            <p className=" text-xs">example@gmail.com</p>
-            <p className=" font-semibold">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Facilis,
-              adipisci.
-            </p>
-          </div>
-          {/* outgoing message */}
-
-          <div className="chat w-9/12 mb-0.5 ml-auto bg-gray-100 p-1 mr-0.5 rounded-md text-black">
-            <p className=" text-xs">example@gmail.com</p>
-            <p className=" font-semibold">
-              Lorem ipsum dolor sit amet consectetur, .
-            </p>
-          </div>
-        </div>
-
+        <div className="flex-1 chat overflow-y-auto  w-full flex-wrap py-2 gap-5 px-0"></div>
+             
         {/* messages input */}
         <div className="mt-4 gap-1 mx-0.5 flex">
           <input
