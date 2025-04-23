@@ -7,6 +7,7 @@ import userRoutes from "./Routes/userRoutes.js";
 import cookieParser from "cookie-parser";
 import cors from 'cors'
 import projectsRoutes from "./Routes/projectRoutes.js";
+import routes from "./Routes/ai.routes.js";
 
 
 
@@ -26,5 +27,6 @@ dbConnect();
 
 app.use('/api/v1/user', userRoutes)
 app.use('/api/v1/project', projectsRoutes)
+app.use('/api/v1/ai', routes)
 
 export default app;
