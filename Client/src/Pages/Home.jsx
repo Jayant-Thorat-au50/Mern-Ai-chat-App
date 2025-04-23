@@ -143,6 +143,12 @@ function Home() {
               placeholder="My Awesome Project"
               value={newProject.name}
               onChange={(e) => setNewProject({ name: e.target.value })}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  createNewProject(e);
+                }
+              }}
+              required
             />
 
             <button

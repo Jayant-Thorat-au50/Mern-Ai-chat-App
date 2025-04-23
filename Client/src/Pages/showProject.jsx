@@ -144,6 +144,11 @@ function ShowProject() {
     };
     appendOutgoingMessage(data);
   };
+  const sendOnEnter = (e) => {
+    if(e.key === "Enter"){
+      send();
+    }
+  };
 
   const appendIncomingMessage = (message) => {
 
@@ -316,6 +321,7 @@ function ShowProject() {
                 message: e.target.value,
               }))
             }
+            onKeyDown={sendOnEnter}
             className="w-full focus:border-none p-2 rounded bg-gray-700 text-white"
             placeholder="Type a message..."
           />
