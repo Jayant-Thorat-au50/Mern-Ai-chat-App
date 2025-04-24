@@ -153,7 +153,7 @@ function ShowProject() {
   };
 
   const scrollToBottom = () => {
-    messageBox.current.scrollTop = messageBox.current.scrollHeight;
+    // messageBox.current.scrollTop = messageBox.current.scrollHeight;
   };
 
   const appendIncomingMessage = (message) => {
@@ -164,7 +164,7 @@ function ShowProject() {
     const color = generateRandomColorStyle();
     const newMessage = document.createElement("div");
     newMessage.className =
-      "text-wrap break-words w-9/12 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-md text-black";
+      "text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black";
 
     if (incomingMessageLoading) {
     }
@@ -172,7 +172,7 @@ function ShowProject() {
     <div class="flex justify-start gap-1 items-center">
             
     <span class=" border-2  p-1.5 rounded-full" ></span>
-    <p class= "text-xs" style="color:${color}" >${message.sender}</p>
+    <p class= "text-xs font-bold" style="color:${color}" >${message.sender}</p>
     </div>
     <p class=" font-semibold">${message.message}</p>
     `;
@@ -193,14 +193,14 @@ function ShowProject() {
 
     const newMessage = document.createElement("div");
     newMessage.className =
-      "  text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-md text-black";
+      "  text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black";
     newMessage.innerHTML = `
 
     
           <div class="flex justify-start gap-1 items-center">
             
           <span class=" border-2  p-1.5 rounded-full" ></span>
-          <p class= "text-xs" style="color:${color}" >${user.email}</p>
+          <p class= "text-xs font-bold" style="color:${color}" >${user.email}</p>
           </div>
           <p class=" font-semibold">${message.message}</p>
           `;

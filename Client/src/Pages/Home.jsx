@@ -118,7 +118,7 @@ function Home() {
       {/* create project modal */}
 
       {createProjectModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md p-4">
+        <div className="fixed inset-0 flex animate-fade-in ease-in-out duration-50 items-center justify-center bg-black/50 backdrop-blur-md p-4">
           <form
             noValidate
             onSubmit={createNewProject}

@@ -1,3 +1,5 @@
+
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -5,7 +7,17 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+       keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0' , transform:"translateY(0)", transform:"translateX(0)" },
+          '100%': { opacity: '1', transform:"translateY(20px)", transform:"translateX(-1px)"},
+        }
+      },
+      animation: {
+        'fade-in': 'fade-in 0.3s ease-out forwards',
+      }
+    },
   },
   plugins: [],
 }
