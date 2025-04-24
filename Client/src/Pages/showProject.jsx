@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FiSend } from "react-icons/fi";
-import {  useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
 import { FaPlus, FaUser } from "react-icons/fa";
@@ -16,7 +16,7 @@ import {
   sendMsg,
   receiveMsg,
 } from "../Helpers/socketInstance.js";
-import '../../src/App.css'
+import "../../src/App.css";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -30,14 +30,15 @@ function ShowProject() {
   });
   const [selectedUsersIds, setSelectedUsersIds] = useState([]);
   const [selectedUsersIdsRM, setSelectedUsersIdsRM] = useState([]);
+  const [incomingMessageLoading, setIncomingMessageLoading] = useState(true);
 
-  const messageBox =React.createRef()
+  const messageBox = React.createRef();
 
   const dispacth = useDispatch();
   let { AllUsersList } = useSelector((state) => state?.authState);
   const { user } = useSelector((state) => state?.authState);
 
-  const usersToAdd = AllUsersList?.filter(user => {
+  const usersToAdd = AllUsersList?.filter((user) => {
     return !projectUtilsStates.project.users.some(
       (user1) => user1._id === user._id
     );
@@ -132,11 +133,12 @@ function ShowProject() {
   };
 
   const send = () => {
-    if(projectUtilsStates.message.trim() === "") return;
+    if (projectUtilsStates.message.trim() === "") return;
     sendMsg("project-message", {
       message: projectUtilsStates.message,
       sender: user._id,
     });
+
     setProjectUtilsStates((prev) => ({ ...prev, message: "" }));
     const data = {
       message: projectUtilsStates.message,
@@ -145,28 +147,46 @@ function ShowProject() {
     appendOutgoingMessage(data);
   };
   const sendOnEnter = (e) => {
-    if(e.key === "Enter"){
+    if (e.key === "Enter") {
       send();
     }
+  };
+
+  const scrollToBottom = () => {
+    messageBox.current.scrollTop = messageBox.current.scrollHeight;
   };
 
   const appendIncomingMessage = (message) => {
 
     // incoming message from other users
     const messageBox = document.querySelector(".chat");
-
+    
+    const color = generateRandomColorStyle();
     const newMessage = document.createElement("div");
     newMessage.className =
       "text-wrap break-words w-9/12 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-md text-black";
+
+    if (incomingMessageLoading) {
+    }
     newMessage.innerHTML = `
-      <p class=" text-xs">${message.sender}</p>
-      <p class=" font-semibold">${message.message}</p>
+    <div class="flex justify-start gap-1 items-center">
+            
+    <span class=" border-2  p-1.5 rounded-full" ></span>
+    <p class= "text-xs" style="color:${color}" >${message.sender}</p>
+    </div>
+    <p class=" font-semibold">${message.message}</p>
     `;
 
     messageBox.appendChild(newMessage);
-    scrollToBottom()
+    scrollToBottom();
+  };
+
+  const generateRandomColorStyle = () => {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
   };
   const appendOutgoingMessage = (message) => {
+    const color = generateRandomColorStyle();
+    // color = "text-[" + color + "]";
 
     // outgoing message from the user
     const messageBox = document.querySelector(".chat");
@@ -175,17 +195,19 @@ function ShowProject() {
     newMessage.className =
       "  text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-md text-black";
     newMessage.innerHTML = `
-      <p class=" text-xs">${user.email}</p>
-      <p class=" font-semibold">${message.message}</p>
-    `;
+
+    
+          <div class="flex justify-start gap-1 items-center">
+            
+          <span class=" border-2  p-1.5 rounded-full" ></span>
+          <p class= "text-xs" style="color:${color}" >${user.email}</p>
+          </div>
+          <p class=" font-semibold">${message.message}</p>
+          `;
 
     messageBox.appendChild(newMessage);
-    scrollToBottom()
+    scrollToBottom();
   };
-
-  const scrollToBottom = () => {
-         messageBox.current.scrollTop =messageBox.current.scrollHeight
-  }
 
   useEffect(() => {
     initializeSocket(projectUtilsStates.project._id);
@@ -215,18 +237,19 @@ function ShowProject() {
               {projectUtilsStates.project.name}
             </h2>
             <div className=" border border-gray-400 hover:border-gray-700 p-0 rounded-full">
-            <IoMdClose
-              onClick={() =>
-                setProjectUtilsStates((prev) => ({
-                  ...prev,
-                  existsingUsersOpen: !projectUtilsStates.existsingUsersOpen,
-                }))
-              }
-              className=" text-gray-500 hover:text-black transition-all ease-in-out duration-200 p-1 border-gray-800 text-4xl"
-            />
+              <IoMdClose
+                onClick={() =>
+                  setProjectUtilsStates((prev) => ({
+                    ...prev,
+                    existsingUsersOpen: !projectUtilsStates.existsingUsersOpen,
+                  }))
+                }
+                className=" text-gray-500 hover:text-black transition-all ease-in-out duration-200 p-1 border-gray-800 text-4xl"
+              />
             </div>
           </header>
 
+          <div></div>
           <div className=" w-full border border-black border-t-0 bg-slate-300 flex gap-2 justify-start items-center py-2 px-4">
             <div className=" w-full flex gap-3 items-center">
               <span className=" p-2 aspect-square bg-white">
@@ -308,10 +331,13 @@ function ShowProject() {
         </header>
 
         {/* messages list conversation area */}
-        <div ref={messageBox} className="flex-1 chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"></div>
-             
+        <div
+          ref={messageBox}
+          className="flex-1 chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"
+        ></div>
+
         {/* messages input */}
-        <div className="mt-4 gap-1 mx-0.5 flex">
+        <div className="mt-4 gap-0.5 mx-0.5 flex">
           <input
             type="text"
             value={projectUtilsStates.message}
@@ -322,12 +348,12 @@ function ShowProject() {
               }))
             }
             onKeyDown={sendOnEnter}
-            className="w-full focus:border-none p-2 rounded bg-gray-700 text-white"
-            placeholder="Type a message..."
+            className="w-full focus:outline-none border p-2 rounded bg-gray-700 text-white"
+            placeholder="Type a message.................."
           />
           <button
             onClick={send}
-            className=" p-3 hover:bg-gray-500  border-2 rounded border-white"
+            className=" p-3 hover:bg-gray-500  border rounded border-white"
           >
             <FiSend className="text-lg" />
           </button>
@@ -473,9 +499,3 @@ function ShowProject() {
 }
 
 export default ShowProject;
-
-		
-		
-		
-		
-                                    

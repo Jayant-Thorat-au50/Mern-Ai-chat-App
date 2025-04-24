@@ -7,6 +7,7 @@ import JWT from "jsonwebtoken";
 import mongoose from "mongoose";
 import ProjectModel from "./Models/ProjectModel.js";
 import UserModel from "./Models/UserModel.js";
+import { generatResult } from "./Controller/services/ai.services.js";
 
 const port = process.env.port;
 
@@ -57,7 +58,7 @@ io.on("connection", (socket) => {
 
   console.log("a user connected");
 
-  socket.join(socket.roomId)
+  socket.join(socket.roomId);
 
   socket.on("project-message", async (data) => {
     console.log(data.sender);
@@ -66,7 +67,7 @@ io.on("connection", (socket) => {
     if (!user) {
       return new Error("user does not exists");
     }
-  
+
     if (!socket.project) {
       return new Error("project does not exists");
     }
@@ -76,15 +77,27 @@ io.on("connection", (socket) => {
       message: data.message,
     };
 
+    const messageForAi = data.message.includes("@ai");
+    if (messageForAi) {
+      const response = await generatResult(data.message);
+      if(!response) return;
+      socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);
+     io.to(socket.roomId).emit("project-message", {
+        sender: "@Gemini 2.0 flash",
+        message: response,
+      });
+      return;
+    }
+
     socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);
   });
 
-  socket.on("event", dataToSend => {/* … */});
+  socket.on("event", (dataToSend) => {
+    /* … */
+  });
   socket.on("disconnect", () => {
-
-    console.log('user disconnected');
-    socket.leave(socket.roomId)
-    
+    console.log("user disconnected");
+    socket.leave(socket.roomId);
   });
 });
 

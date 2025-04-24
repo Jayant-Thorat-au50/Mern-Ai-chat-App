@@ -7,14 +7,12 @@ import { FaPlus } from "react-icons/fa";
 import { createProject, getAllProjects } from "../Redux/Slices/Projectslices";
 import Projects from "../component/projects.jsx";
 
-
 function Home() {
   const dispacth = useDispatch();
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem("user"));
   const isLoggedIn = JSON.parse(localStorage.getItem("isLoggedIn"));
   const projects = useSelector((state) => state.projectstate.projectsList);
-
 
   const [newProject, setNewProject] = useState({
     name: "",
@@ -143,7 +141,7 @@ function Home() {
               placeholder="My Awesome Project"
               value={newProject.name}
               onChange={(e) => setNewProject({ name: e.target.value })}
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   createNewProject(e);
                 }
