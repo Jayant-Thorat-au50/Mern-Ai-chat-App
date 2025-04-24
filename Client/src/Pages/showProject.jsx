@@ -17,6 +17,7 @@ import {
   receiveMsg,
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
+import toast from "react-hot-toast";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -157,10 +158,9 @@ function ShowProject() {
   };
 
   const appendIncomingMessage = (message) => {
-
     // incoming message from other users
     const messageBox = document.querySelector(".chat");
-    
+
     const color = generateRandomColorStyle();
     const newMessage = document.createElement("div");
     newMessage.className =
@@ -221,18 +221,18 @@ function ShowProject() {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex  flex-col lg:flex-row  h-screen w-screen">
       {/* left side of the project chat window */}
-      <section className=" relative w-3/12  bg-gray-800 text-white pt-0 pb-1 flex flex-col">
+      <section className=" relative lg:w-3/12 w-full min-h-[100vh]  bg-gray-800 text-white pt-0 pb-1 flex flex-col">
         {/* users list in project (side panel) */}
         <div
           className={
             !projectUtilsStates.existsingUsersOpen
-              ? "h-full w-full bg-gray-400 absolute top-0 transition-all ease-in-out duration-300 "
+              ? "h-full w-full bg-gray-400 absolute top-0 transition-all ease-in-out z-50 duration-300 "
               : "h-full w-full bg-gray-400 absolute top-0 transition-all ease-linear -translate-x-96 "
           }
         >
-          <header className=" flex items-center bg-white justify-end w-full px-5 py-2">
+          <header className=" flex items-center bg-white justify-end w-full lg:px-5 px-1 py-2">
             <h2 className=" text-black text-lg font-bold text-center flex-grow">
               {projectUtilsStates.project.name}
             </h2>
@@ -286,7 +286,7 @@ function ShowProject() {
         </div>
 
         {/* header of the window */}
-        <header className=" py-2 flex justify-between  items-center px-5 bg-slate-400 w-full">
+        <header className=" py-2 flex justify-between  items-center lg:px-5 px-1 bg-slate-400 w-full">
           <div className=" flex gap-2 items-center border-black px-2 border py-1 rounded-md ">
             <FaPlus />
             <button
