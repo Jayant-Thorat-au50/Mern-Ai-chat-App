@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenerativeAI("AIzaSyBbWVX8UFINcbgBrQn9EFiDVvCI1jlfeRQ");
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const generatResult = async (prompt) => {
   const response = await ai

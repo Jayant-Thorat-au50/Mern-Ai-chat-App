@@ -17,8 +17,6 @@ import {
   receiveMsg,
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
-import toast from "react-hot-toast";
-
 function ShowProject() {
   const { state } = useLocation();
   const [projectUtilsStates, setProjectUtilsStates] = useState({
