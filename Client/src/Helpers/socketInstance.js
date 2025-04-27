@@ -3,7 +3,7 @@ import socket from "socket.io-client";
 let socketInstance = null;
 
 export const initializeSocket = (projectId) => {
-  socketInstance = socket("https://mern-ai-chat-app-1vdd.onrender.com/api/v1", {
+  socketInstance = socket("https://mern-ai-chat-app-1vdd.onrender.com", {
     auth: {
       token: JSON.parse(localStorage.getItem("token")),
     },
