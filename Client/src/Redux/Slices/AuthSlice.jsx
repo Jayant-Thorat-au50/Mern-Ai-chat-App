@@ -19,10 +19,12 @@ export const signUp = createAsyncThunk("/user/register", async (data) => {
       success: () => {
         return "Account created successfully!";
       },
-      error: "Failed to create account",
     });
     return (await response).data;
   } catch (error) {
+    if (!error.response.data.errors) {
+      toast.error("failed to login try again");
+    }
     toast.error(error.response.data.errors);
     return error.response.data;
   }
@@ -49,13 +51,12 @@ export const login = createAsyncThunk("/user/login", async (data) => {
       success: () => {
         return "Logged in successfully!";
       },
-      error: "Failed to login",
     });
     return (await response).data;
   } catch (error) {
-    console.log(error.response.data.errors[0].msg);
+    console.log(error.response.data.errors);
 
-    toast.error(error.response.data.errors[0].msg);
+    toast.error(error.response.data.errors);
     return error.response.data;
   }
 });
@@ -108,6 +109,7 @@ const AuthSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(signUp.fulfilled, (state, action) => {
+        if (!action.payload.success) return;
         state.user = action.payload.User;
         state.isLoggedIn = true;
         localStorage.setItem("user", JSON.stringify(action.payload.User));
@@ -115,6 +117,7 @@ const AuthSlice = createSlice({
           localStorage.setItem("token", JSON.stringify(action.payload.token));
       })
       .addCase(login.fulfilled, (state, action) => {
+        if (!action.payload.success) return;
         state.user = action.payload.user;
         state.isLoggedIn = true;
         localStorage.setItem("user", JSON.stringify(action.payload.user));

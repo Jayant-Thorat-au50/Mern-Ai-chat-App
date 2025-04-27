@@ -42,9 +42,6 @@ export const getAllProjects = createAsyncThunk("project/getAll", async () => {
 
     toast.promise(response, {
       loading: "fetching all projects",
-      success: () => {
-        return "Projects fetched successfully!";
-      },
       error: "Failed to get all project",
     });
 

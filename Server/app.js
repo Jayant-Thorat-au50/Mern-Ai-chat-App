@@ -14,10 +14,13 @@ import routes from "./Routes/ai.routes.js";
 const app = express();
 
 app.use(cors({
-    // origin:"http://localhost:5173",
-    origin:'https://chatjay23.netlify.app',
+    origin:"http://localhost:5173",
+    // origin:'https://chatjay23.netlify.app',
     credentials:true,
 }))
+
+
+
 
 app.use(morgan('dev'))
 app.use(express.json())

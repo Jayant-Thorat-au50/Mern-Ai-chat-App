@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
@@ -17,6 +17,7 @@ import {
   receiveMsg,
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
+import toast from "react-hot-toast";
 function ShowProject() {
   const { state } = useLocation();
   const [projectUtilsStates, setProjectUtilsStates] = useState({
@@ -30,8 +31,9 @@ function ShowProject() {
   const [selectedUsersIds, setSelectedUsersIds] = useState([]);
   const [selectedUsersIdsRM, setSelectedUsersIdsRM] = useState([]);
   const [incomingMessageLoading, setIncomingMessageLoading] = useState(true);
+  const [messages, setMessages] = useState([]);
 
-  const messageBox = React.createRef();
+  const messageBox = useRef(null)
 
   const dispacth = useDispatch();
   let { AllUsersList } = useSelector((state) => state?.authState);
@@ -143,8 +145,10 @@ function ShowProject() {
       message: projectUtilsStates.message,
       sender: user._id,
     };
-    appendOutgoingMessage(data);
+    setMessages((prev => [...prev, {...data, received:false}])); 
+    // appendOutgoingMessage(data);
   };
+  console.log(messages);
   const sendOnEnter = (e) => {
     if (e.key === "Enter") {
       send();
@@ -155,9 +159,21 @@ function ShowProject() {
     // messageBox.current.scrollTop = messageBox.current.scrollHeight;
   };
 
+  
+
   const appendIncomingMessage = (message) => {
     // incoming message from other users
     const messageBox = document.querySelector(".chat");
+      
+    const string = message.sender.indexOf('@');
+
+    let sender;
+    if(string){
+
+       sender = message.sender.slice(0, message.sender.indexOf('@'));
+    } else{
+          sender = message.sender
+    }
 
     const color = generateRandomColorStyle();
     const newMessage = document.createElement("div");
@@ -170,7 +186,7 @@ function ShowProject() {
     <div class="flex justify-start gap-1 items-center">
             
     <span class=" border-2  p-1.5 rounded-full" ></span>
-    <p class= "text-xs font-bold" style="color:${color}" >${message.sender}</p>
+    <p class= "text-xs font-bold" style="color:${color}" >@${sender}</p>
     </div>
     <p class=" font-semibold">${message.message}</p>
     `;
@@ -198,7 +214,7 @@ function ShowProject() {
           <div class="flex justify-start gap-1 items-center">
             
           <span class=" border-2  p-1.5 rounded-full" ></span>
-          <p class= "text-xs font-bold" style="color:${color}" >${user.email}</p>
+          <p class= "text-xs font-bold" style="color:${color}" >@${user.email.slice(0, user.email.indexOf('@'))}</p>
           </div>
           <p class=" font-semibold">${message.message}</p>
           `;
@@ -208,14 +224,21 @@ function ShowProject() {
   };
 
   useEffect(() => {
-    initializeSocket(projectUtilsStates.project._id);
+    const response = initializeSocket(projectUtilsStates.project._id);
+
+    if(!response){
+      toast.error('connection failed')
+    }
 
     getUpdatedProject(state._id);
     getAllUsersList();
     receiveMsg("project-message", (data) => {
       console.log(data);
-      appendIncomingMessage(data);
+      setMessages((prev => [...prev, {...data, received:true},])); 
+      // appendIncomingMessage(data);
     });
+
+    
   }, []);
 
   return (
@@ -332,7 +355,36 @@ function ShowProject() {
         <div
           ref={messageBox}
           className="flex-1 chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"
-        ></div>
+        >
+        
+        {
+           messages.map(msg => { 
+            const color = generateRandomColorStyle();
+           return (!msg.received ? (
+            <div className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
+             <div className="flex justify-start gap-1 items-center">
+            
+            <span className=" border-2  p-1.5 rounded-full" ></span>
+            <p className= {`text-xs font-bold`}  style={{color:color}}  >@{user.email.slice(0, user.email.indexOf('@'))}</p>
+            </div>
+            <p className=" font-semibold">{msg.message}</p>
+
+            </div>
+          ) : (
+            <div className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
+              <div className="flex justify-start gap-1 items-center">
+            
+            <span className=" border-2  p-1.5 rounded-full" ></span>
+            <p className= {`text-xs font-bold]`} style={{color:color}} >@{msg.sender}</p>
+            </div>
+            <p className=" font-semibold">{msg.message}</p>
+
+            </div>
+          ))}
+          )
+        }
+        
+        </div>
 
         {/* messages input */}
         <div className="mt-4 gap-0.5 mx-0.5 flex">

@@ -15,7 +15,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin:'https://chatjay23.netlify.app'
+    origin:'*'
+    // origin:'https://chatjay23.netlify.app'
   },
 });
 
@@ -83,7 +84,7 @@ io.on("connection", (socket) => {
       if(!response) return;
       socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);
      io.to(socket.roomId).emit("project-message", {
-        sender: "@Gemini 2.0 flash",
+        sender: "Gemini 2.0 flash",
         message: response,
       });
       return;

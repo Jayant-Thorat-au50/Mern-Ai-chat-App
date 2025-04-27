@@ -103,7 +103,7 @@ export const loginController = async (req, res) => {
 
     const user = await UserModel.findOne({ email: email }).select("+password");
     if (!user) {
-      res.status(401).json({ errors: "Invalid user" });
+     return res.status(401).json({ errors: "user does not exists" });
     }
 
     const isPasswordValid = bcrypt.compare(password, user.password);
@@ -125,7 +125,8 @@ export const loginController = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.status(400).json(error.message);
+   
+   return res.status(400).json(error.message);
   }
 };
 
