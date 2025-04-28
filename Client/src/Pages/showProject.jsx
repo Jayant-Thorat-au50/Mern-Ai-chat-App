@@ -299,7 +299,7 @@ function ShowProject() {
           className={
             !projectUtilsStates.existsingUsersOpen
               ? "h-full w-full bg-gray-400 absolute top-0 transition-all ease-in-out z-50 duration-300 "
-              : "h-full w-full bg-gray-400 absolute top-0 transition-all ease-linear -translate-x-96 "
+              : "h-full w-full bg-gray-400 absolute top-0 transition-all ease-linear -translate-x-[30rem] "
           }
         >
           <header className=" flex items-center bg-white justify-end w-full lg:px-5 px-1 py-2">
