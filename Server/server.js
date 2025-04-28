@@ -48,6 +48,11 @@ io.use(async (socket, next) => {
 
     socket.user = decoded;
     socket.project = project;
+
+    if(!socket.project.users.includes(socket.user.id)){
+      return next(new Error("You are no longer a member of this project"));
+    }
+    
     next();
   } catch (error) {
     next(new Error("error", error));

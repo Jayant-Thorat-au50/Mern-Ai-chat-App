@@ -3,9 +3,10 @@ import { FiSend } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
-import { FaPlus, FaUser } from "react-icons/fa";
+import { FaPlus, FaUser, FaUserFriends } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../Redux/Slices/AuthSlice";
+import Markdown from "markdown-to-jsx";
 import {
   addUsersToProject,
   getProject,
@@ -18,6 +19,7 @@ import {
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
 import toast from "react-hot-toast";
+
 function ShowProject() {
   const { state } = useLocation();
   const [projectUtilsStates, setProjectUtilsStates] = useState({
@@ -32,8 +34,9 @@ function ShowProject() {
   const [selectedUsersIdsRM, setSelectedUsersIdsRM] = useState([]);
   const [incomingMessageLoading, setIncomingMessageLoading] = useState(true);
   const [messages, setMessages] = useState([]);
+  const [aiMessageLoading, setAiMessageLoading] = useState(false);
 
-  const messageBox = useRef(null)
+  const messageBox = useRef(null);
 
   const dispacth = useDispatch();
   let { AllUsersList } = useSelector((state) => state?.authState);
@@ -60,15 +63,39 @@ function ShowProject() {
       }
     });
   };
-  const selectUserIdsRemove = async (userId) => {
+  const selectUserIdsRemove = async (user) => {
     setSelectedUsersIdsRM((prev) => {
-      if (prev.includes(userId)) {
-        return prev.filter((id) => id !== userId);
+      console.log(prev);
+
+      if (prev.includes(user._id)) {
+        return prev.filter((id) => id !== user._id);
       } else {
-        return [...prev, userId];
+        return [...prev, user._id];
       }
     });
   };
+
+  const selectAllToRemove = () => {
+    if (usersToRemove.length !== selectedUsersIdsRM.length) {
+      setSelectedUsersIdsRM(() => []);
+      setSelectedUsersIdsRM(() => [...usersToRemove.map((e) => e._id)]);
+      console.log(usersToRemove.length, selectedUsersIdsRM.length);
+    } else {
+      setSelectedUsersIdsRM([]);
+    }
+  };
+  const selectAllToAdd = () => {
+    console.log(usersToAdd.length, selectedUsersIds.length);
+
+    if (selectedUsersIds.length !== usersToAdd.length) {
+      setSelectedUsersIds(() => []);
+      setSelectedUsersIds(() => [...usersToAdd.map((e) => e._id)]);
+    } else {
+      setSelectedUsersIds(() => []);
+    }
+  };
+
+  console.log(selectedUsersIds);
 
   const handleAddUsers = async () => {
     const response = await dispacth(
@@ -81,6 +108,7 @@ function ShowProject() {
       getUpdatedProject(projectUtilsStates.project._id);
       setProjectUtilsStates((prev) => ({ ...prev, addCollabModalOpen: false }));
       setSelectedUsersIds([]);
+      window.location.reload();
     }
   };
 
@@ -134,21 +162,33 @@ function ShowProject() {
   };
 
   const send = () => {
+    if (
+      state.users.length <= 1 &&
+      !projectUtilsStates.message.includes("@ai")
+    ) {
+      alert("consider adding collaborators first");
+    }
+
     if (projectUtilsStates.message.trim() === "") return;
-    sendMsg("project-message", {
+    const sent = sendMsg("project-message", {
       message: projectUtilsStates.message,
       sender: user._id,
     });
+
+    if (!sent) {
+      setProjectUtilsStates((prev) => ({ ...prev, message: "" }));
+      return;
+    }
 
     setProjectUtilsStates((prev) => ({ ...prev, message: "" }));
     const data = {
       message: projectUtilsStates.message,
       sender: user._id,
     };
-    setMessages((prev => [...prev, {...data, received:false}])); 
+    setMessages((prev) => [...prev, { ...data, received: false }]);
     // appendOutgoingMessage(data);
   };
-  console.log(messages);
+
   const sendOnEnter = (e) => {
     if (e.key === "Enter") {
       send();
@@ -159,20 +199,17 @@ function ShowProject() {
     // messageBox.current.scrollTop = messageBox.current.scrollHeight;
   };
 
-  
-
   const appendIncomingMessage = (message) => {
     // incoming message from other users
     const messageBox = document.querySelector(".chat");
-      
-    const string = message.sender.indexOf('@');
+
+    const string = message.sender.indexOf("@");
 
     let sender;
-    if(string){
-
-       sender = message.sender.slice(0, message.sender.indexOf('@'));
-    } else{
-          sender = message.sender
+    if (string) {
+      sender = message.sender.slice(0, message.sender.indexOf("@"));
+    } else {
+      sender = message.sender;
     }
 
     const color = generateRandomColorStyle();
@@ -195,12 +232,23 @@ function ShowProject() {
     scrollToBottom();
   };
 
+  const LoadingMessage = () => {
+    const parentDiv = document.querySelector(".chat");
+    const loadingMessageDiv = document.createElement("div");
+
+    loadingMessageDiv.className = `text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black`;
+
+    loadingMessageDiv.innerHTML = `
+     <p>loading...</p>
+    `;
+    parentDiv.appendChild(loadingMessageDiv);
+  };
+
   const generateRandomColorStyle = () => {
     return "#" + Math.floor(Math.random() * 16777215).toString(16);
   };
   const appendOutgoingMessage = (message) => {
     const color = generateRandomColorStyle();
-    // color = "text-[" + color + "]";
 
     // outgoing message from the user
     const messageBox = document.querySelector(".chat");
@@ -214,7 +262,10 @@ function ShowProject() {
           <div class="flex justify-start gap-1 items-center">
             
           <span class=" border-2  p-1.5 rounded-full" ></span>
-          <p class= "text-xs font-bold" style="color:${color}" >@${user.email.slice(0, user.email.indexOf('@'))}</p>
+          <p class= "text-xs font-bold" style="color:${color}" >@${user.email.slice(
+      0,
+      user.email.indexOf("@")
+    )}</p>
           </div>
           <p class=" font-semibold">${message.message}</p>
           `;
@@ -226,25 +277,23 @@ function ShowProject() {
   useEffect(() => {
     const response = initializeSocket(projectUtilsStates.project._id);
 
-    if(!response){
-      toast.error('connection failed')
+    if (!response) {
+      toast.error("connection failed");
     }
 
     getUpdatedProject(state._id);
     getAllUsersList();
     receiveMsg("project-message", (data) => {
       console.log(data);
-      setMessages((prev => [...prev, {...data, received:true},])); 
+      setMessages((prev) => [...prev, { ...data, received: true }]);
       // appendIncomingMessage(data);
     });
-
-    
   }, []);
 
   return (
     <div className="flex  flex-col lg:flex-row  h-screen w-screen">
       {/* left side of the project chat window */}
-      <section className=" relative lg:w-3/12 w-full min-h-[100vh]  bg-gray-800 text-white pt-0 pb-1 flex flex-col">
+      <section className="  relative lg:w-3/12 w-full min-h-[100vh]  bg-gray-800 text-white pt-0 pb-1 flex flex-col">
         {/* users list in project (side panel) */}
         <div
           className={
@@ -354,36 +403,44 @@ function ShowProject() {
         {/* messages list conversation area */}
         <div
           ref={messageBox}
-          className="flex-1 chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"
+          className="flex-1  chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"
         >
-        
-        {
-           messages.map(msg => { 
+          {messages.map((msg) => {
             const color = generateRandomColorStyle();
-           return (!msg.received ? (
-            <div className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
-             <div className="flex justify-start gap-1 items-center">
-            
-            <span className=" border-2  p-1.5 rounded-full" ></span>
-            <p className= {`text-xs font-bold`}  style={{color:color}}  >@{user.email.slice(0, user.email.indexOf('@'))}</p>
-            </div>
-            <p className=" font-semibold">{msg.message}</p>
-
-            </div>
-          ) : (
-            <div className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
-              <div className="flex justify-start gap-1 items-center">
-            
-            <span className=" border-2  p-1.5 rounded-full" ></span>
-            <p className= {`text-xs font-bold]`} style={{color:color}} >@{msg.sender}</p>
-            </div>
-            <p className=" font-semibold">{msg.message}</p>
-
-            </div>
-          ))}
-          )
-        }
-        
+            return !msg.received ? (
+              <div className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
+                <div className="flex justify-start gap-1 items-center">
+                  <span className=" border-2  p-1.5 rounded-full"></span>
+                  <p className={`text-xs font-bold`} style={{ color: color }}>
+                    @{user.email.slice(0, user.email.indexOf("@"))}
+                  </p>
+                </div>
+                <p className=" font-semibold">{msg.message}</p>
+              </div>
+            ) : msg.sender == "Gemini 2.0 flash" ? (
+              <div className="text-wrap break-words w-fit max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto">
+                <div className="flex justify-start gap-1 items-center">
+                  <span className=" border-2  p-1.5 rounded-full"></span>
+                  <p className={`text-xs font-bold]`} style={{ color: color }}>
+                    @{msg.sender}
+                  </p>
+                </div>
+                <p className=" font-semibold">
+                  <Markdown>{msg.message}</Markdown>
+                </p>
+              </div>
+            ) : (
+              <div className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
+                <div className="flex justify-start gap-1 items-center">
+                  <span className=" border-2  p-1.5 rounded-full"></span>
+                  <p className={`text-xs font-bold]`} style={{ color: color }}>
+                    @{msg.sender}
+                  </p>
+                </div>
+                <p className=" font-semibold">{msg.message}</p>
+              </div>
+            );
+          })}
         </div>
 
         {/* messages input */}
@@ -424,7 +481,7 @@ function ShowProject() {
             {/* users list header */}
             <header className=" p-2 text-center border-2  w-full rounded-lg flex justify-between items-center">
               <h2 className=" font-semibold flex-grow text-xl ">
-                Select users
+                Select users <span className=" bg-red-300 px-2 py-0 rounded-full">{selectedUsersIds.length}</span>
               </h2>
               <p
                 type="button"
@@ -444,6 +501,22 @@ function ShowProject() {
             {/* userList */}
 
             <div className="usersList py-1 max-h-80 overflow-y-auto">
+              <div
+                onClick={selectAllToAdd}
+                type="button"
+                className=" border-2  px-4 py-2 hover:bg-gray-300 border-t-0 flex justify-between items-center"
+              >
+                <span className=" border-2 rounded-full p-1 border-black">
+                  {<FaUserFriends />}
+                </span>
+                <p className=" flex-grow px-4">select All</p>
+                <input
+                  type="checkbox"
+                  checked={usersToAdd.length === selectedUsersIds.length}
+                  onChange={() => {}}
+                  className="w-5 h-5"
+                />
+              </div>
               {usersToAdd &&
                 usersToAdd.map((user) => (
                   <div
@@ -488,7 +561,7 @@ function ShowProject() {
             {/* users list header */}
             <header className=" p-2 text-center border-2  w-full rounded-lg flex justify-between items-center">
               <h2 className=" font-semibold flex-grow text-xl ">
-                Select users
+                Select users <span className=" bg-green-300 px-2 py-0 rounded-full">{selectedUsersIdsRM.length}</span>
               </h2>
               <p
                 type="button"
@@ -508,13 +581,31 @@ function ShowProject() {
             {/* userList */}
 
             <div className="usersList py-1 max-h-80 overflow-y-auto">
+              <div
+                onClick={selectAllToRemove}
+                key={user._id}
+                type="button"
+                className=" border-2  px-4 py-2 hover:bg-gray-300 border-t-0 flex justify-between items-center"
+              >
+                <span className=" border-2 rounded-full p-1 border-black">
+                  {<FaUserFriends />}
+                </span>
+                <p className=" flex-grow px-4">select all</p>
+                <input
+                  type="checkbox"
+                  checked={usersToRemove.length === selectedUsersIdsRM.length}
+                  onChange={() => {}}
+                  className="w-5 h-5"
+                />
+              </div>
+
               {usersToRemove &&
                 usersToRemove.map((user) => (
                   <div
-                    onClick={() => selectUserIdsRemove(user._id)}
+                    onClick={() => selectUserIdsRemove(user)}
                     key={user._id}
                     type="button"
-                    className=" border-2  px-4 py-2 hover:bg-gray-300 border-t-0 flex justify-between items-center"
+                    className={` border-2 px-4 py-2 hover:bg-gray-300 border-t-0 flex justify-between items-center`}
                   >
                     <span className=" border-2 rounded-full p-1 border-black">
                       {<FaUser />}
@@ -522,7 +613,10 @@ function ShowProject() {
                     <p className=" flex-grow px-4">{user.email}</p>
                     <input
                       type="checkbox"
-                      checked={selectedUsersIdsRM.includes(user._id)}
+                      checked={
+                        selectedUsersIdsRM.includes(user._id) ||
+                        usersToRemove.length === selectedUsersIdsRM.length
+                      }
                       onChange={() => {}}
                       className="w-5 h-5"
                     />

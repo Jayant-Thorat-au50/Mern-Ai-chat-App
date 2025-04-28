@@ -16,6 +16,7 @@
     "framer-motion": "^12.5.0",
     "heroicons": "^2.2.0",
     "lucide-react": "^0.484.0",
+    "markdown-to-jsx": "^7.7.6",
     "react": "^19.0.0",
     "react-data-table-component": "^7.7.0",
     "react-dom": "^19.0.0",
