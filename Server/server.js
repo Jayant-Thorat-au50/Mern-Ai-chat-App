@@ -13,9 +13,18 @@ const port = process.env.port;
 
 const server = http.createServer(app);
 
+let origin;
+
+if(process.env.NODE_ENV === "production") {
+  origin = "https://chatjay23.netlify.app";
+}
+else{
+  origin = "http://localhost:5173";
+}
+
 const io = new Server(server, {
   cors: {
-    origin:'*'
+    origin:origin
     // origin:'https://chatjay23.netlify.app'
   },
 });
