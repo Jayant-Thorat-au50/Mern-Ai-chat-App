@@ -19,6 +19,8 @@ import {
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
 import toast from "react-hot-toast";
+// import { Prism}  from 'react-syntax-highlighter'
+import { prism  } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 function ShowProject() {
   const { state } = useLocation();
@@ -166,7 +168,8 @@ function ShowProject() {
       state.users.length <= 1 &&
       !projectUtilsStates.message.includes("@ai")
     ) {
-      alert("consider adding collaborators first");
+      alert("consider adding collaborators first", state.users.length);
+      console.log(projectUtilsStates.project);
     }
 
     if (projectUtilsStates.message.trim() === "") return;
@@ -273,6 +276,15 @@ function ShowProject() {
     messageBox.appendChild(newMessage);
     scrollToBottom();
   };
+
+  // const highlightCode = ({className, children}) => {
+  //    const language = className?.replace("lang-", "") || "javascript";
+  //    return (
+  //        <prism  language={language}>
+  //         {children}
+  //        </prism>
+  //    )
+  // }
 
   useEffect(() => {
     const response = initializeSocket(projectUtilsStates.project._id);
@@ -409,16 +421,19 @@ function ShowProject() {
             const color = generateRandomColorStyle();
             return !msg.received ? (
               <div className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
+                                                        {/* sent message */}
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
                   <p className={`text-xs font-bold`} style={{ color: color }}>
                     @{user.email.slice(0, user.email.indexOf("@"))}
                   </p>
-                </div>
+                </div>                                       
                 <p className=" font-semibold">{msg.message}</p>
               </div>
-            ) : msg.sender == "Gemini 2.0 flash" ? (
-              <div className="text-wrap break-words w-fit max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto">
+            ) : msg.sender == "Gemini 2.0 flash" ? 
+                                                    {/* message from ai */}
+            (
+              <div className=" text-wrap break-words w-11/12 max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto">
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
                   <p className={`text-xs font-bold]`} style={{ color: color }}>
@@ -429,12 +444,14 @@ function ShowProject() {
                   <Markdown>{msg.message}</Markdown>
                 </p>
               </div>
-            ) : (
+            ) :
+                                                       {/* received  message */}
+            (
               <div className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
-                  <p className={`text-xs font-bold]`} style={{ color: color }}>
-                    @{msg.sender}
+                  <p className={`text-xs font-bold opacity-5]`} style={{ color: color }}>
+                    @{msg.sender.slice(0, msg.sender.indexOf('@'))}
                   </p>
                 </div>
                 <p className=" font-semibold">{msg.message}</p>
@@ -466,6 +483,7 @@ function ShowProject() {
           </button>
         </div>
       </section>
+      
 
       {/* Right Content Window */}
       <section className=" w-9/12 bg-gray-200 p-4">

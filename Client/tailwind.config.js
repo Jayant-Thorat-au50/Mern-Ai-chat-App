@@ -11,7 +11,7 @@ export default {
        keyframes: {
         'fade-in': {
           '0%': { opacity: '0' , transform:"translateY(0)", transform:"translateX(0)" },
-          '100%': { opacity: '1', transform:"translateY(20px)", transform:"translateX(-1px)"},
+          '100%': { opacity: '1', transform:"translateX(1.0px)"},
         }
       },
       animation: {

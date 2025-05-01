@@ -15,16 +15,15 @@ const server = http.createServer(app);
 
 let origin;
 
-if(process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === "production") {
   origin = "https://chatjay23.netlify.app";
-}
-else{
+} else {
   origin = "http://localhost:5173";
 }
 
 const io = new Server(server, {
   cors: {
-    origin:origin
+    origin: origin,
     // origin:'https://chatjay23.netlify.app'
   },
 });
@@ -58,10 +57,10 @@ io.use(async (socket, next) => {
     socket.user = decoded;
     socket.project = project;
 
-    if(!socket.project.users.includes(socket.user.id)){
+    if (!socket.project.users.includes(socket.user.id)) {
       return next(new Error("You are no longer a member of this project"));
     }
-    
+
     next();
   } catch (error) {
     next(new Error("error", error));
@@ -76,8 +75,6 @@ io.on("connection", (socket) => {
   socket.join(socket.roomId);
 
   socket.on("project-message", async (data) => {
-    console.log(data.sender);
-
     const user = await UserModel.findById(data.sender);
     if (!user) {
       return new Error("user does not exists");
@@ -94,14 +91,24 @@ io.on("connection", (socket) => {
 
     const messageForAi = data.message.includes("@ai");
     if (messageForAi) {
-      const response = await generatResult(data.message);
-      if(!response) return;
+      try {
+        const response = await generatResult(data.message);
+    
+      
+      if (!response) return;
       socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);
-     io.to(socket.roomId).emit("project-message", {
+      io.to(socket.roomId).emit("project-message", {
         sender: "Gemini 2.0 flash",
         message: response,
       });
       return;
+    } catch (error) {
+      io.to(socket.roomId).emit("project-message", {
+        sender: "Gemini 2.0 flash",
+        message: error.message,
+      });
+      
+    }
     }
 
     socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);

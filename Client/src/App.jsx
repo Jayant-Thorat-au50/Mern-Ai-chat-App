@@ -24,7 +24,6 @@ function App() {
       <Route path="/loginModal" element={<LoginModal />} />
       <Route path="/loginModall" element={<LoginModall />} />
       <Route path="/signUpmodal" element={<SignUpmodal />} />
-      {/* <Route path='/hero' element={<HeroSection/>}  /> */}
       <Route path="/adminRequests" element={<SuperAdminRequests />} />
       <Route path="/herosection" element={<HeroSectionLMS />} />
       <Route path="/projects" element={<Projects />} />
