@@ -9,9 +9,8 @@ import { BrowserRouter } from "react-router-dom";
 
 const toastOptions = {
   position:"top-center",
-  duration:'120',
   style:{
-    color:'black',
+    color:'green',
     borderRadius:'2px',
   },
   success:{

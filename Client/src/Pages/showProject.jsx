@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Component, useEffect, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
@@ -19,9 +19,10 @@ import {
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
 import toast from "react-hot-toast";
-// import { Prism}  from 'react-syntax-highlighter'
-import { prism  } from "react-syntax-highlighter/dist/esm/styles/prism";
-
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { solarizedDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 function ShowProject() {
   const { state } = useLocation();
   const [projectUtilsStates, setProjectUtilsStates] = useState({
@@ -96,8 +97,6 @@ function ShowProject() {
       setSelectedUsersIds(() => []);
     }
   };
-
-  console.log(selectedUsersIds);
 
   const handleAddUsers = async () => {
     const response = await dispacth(
@@ -188,7 +187,9 @@ function ShowProject() {
       message: projectUtilsStates.message,
       sender: user._id,
     };
+
     setMessages((prev) => [...prev, { ...data, received: false }]);
+
     // appendOutgoingMessage(data);
   };
 
@@ -277,14 +278,57 @@ function ShowProject() {
     scrollToBottom();
   };
 
-  // const highlightCode = ({className, children}) => {
-  //    const language = className?.replace("lang-", "") || "javascript";
-  //    return (
-  //        <prism  language={language}>
-  //         {children}
-  //        </prism>
-  //    )
-  // }
+  const options = {
+    overrides: {
+      p: {
+        component: ({ children, ...props }) => {
+          // Detect if children already contain block-level content (like <ol>, <ul>, etc.)
+          const containsBlock = React.Children.toArray(children).some(
+            (child) =>
+              typeof child === "object" &&
+              ["ol", "ul", "div", "pre"].includes(child?.type)
+          );
+  
+          // Avoid <p> if block-level children are present
+          return containsBlock ? <>{children}</> : <p {...props}>{children}</p>;
+        },
+      },
+      pre: {
+        component: ({ children }) => <div>{children}</div>
+      },
+      code: {
+        component: ({ className = "", children, ...props }) => {
+          const language = className?.replace("/language-/", "") || "";
+          const isBlock = /\n/.test(children);
+          return isBlock ? (
+            <SyntaxHighlighter
+              language={language}
+              style={vscDarkPlus}
+              customStyle={{
+                margin: "1rem 0",
+                padding: "1rem",
+                background: "#1e1e1e",
+                borderRadius: "0.5rem",
+                fontSize: "0.9rem",
+                lineHeight: "1.5",
+                fontFamily:
+                  'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+                overflowX: "auto",
+              }}
+              PreTag="div"
+              {...props}
+            >
+              {String(children).replace(/\n$/, "")}
+            </SyntaxHighlighter>
+          ) : (
+            <code className="px-1 bg-black py-0.5 rounded text-sm" {...props}>
+              {children}
+            </code>
+          );
+        },
+      },
+    },
+  };
 
   useEffect(() => {
     const response = initializeSocket(projectUtilsStates.project._id);
@@ -417,41 +461,42 @@ function ShowProject() {
           ref={messageBox}
           className="flex-1  chat overflow-y-auto w-full flex-wrap py-2 gap-5 px-0"
         >
-          {messages.map((msg) => {
+          {messages.map((msg, idx) => {
             const color = generateRandomColorStyle();
             return !msg.received ? (
-              <div className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
-                                                        {/* sent message */}
+              /* sent message */
+              <div key={idx} className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
                   <p className={`text-xs font-bold`} style={{ color: color }}>
                     @{user.email.slice(0, user.email.indexOf("@"))}
                   </p>
-                </div>                                       
+                </div>
                 <p className=" font-semibold">{msg.message}</p>
               </div>
-            ) : msg.sender == "Gemini 2.0 flash" ? 
-                                                    {/* message from ai */}
-            (
-              <div className=" text-wrap break-words w-11/12 max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto">
+            ) : msg.sender == "Gemini 2.0 flash" ? (
+              /* message from ai */
+              <div key={idx} className=" text-wrap break-words w-11/12 max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto">
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
                   <p className={`text-xs font-bold]`} style={{ color: color }}>
                     @{msg.sender}
                   </p>
                 </div>
-                <p className=" font-semibold">
-                  <Markdown>{msg.message}</Markdown>
-                </p>
+                <div className=" font-semibold">
+                  <Markdown options={options}>{msg.message}</Markdown>
+                </div>
               </div>
-            ) :
-                                                       {/* received  message */}
-            (
-              <div className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
+            ) : (
+              /* received  message */
+              <div key={idx} className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
-                  <p className={`text-xs font-bold opacity-5]`} style={{ color: color }}>
-                    @{msg.sender.slice(0, msg.sender.indexOf('@'))}
+                  <p
+                    className={`text-xs font-bold opacity-5]`}
+                    style={{ color: color }}
+                  >
+                    @{msg.sender.slice(0, msg.sender.indexOf("@"))}
                   </p>
                 </div>
                 <p className=" font-semibold">{msg.message}</p>
@@ -483,7 +528,6 @@ function ShowProject() {
           </button>
         </div>
       </section>
-      
 
       {/* Right Content Window */}
       <section className=" w-9/12 bg-gray-200 p-4">
@@ -499,7 +543,10 @@ function ShowProject() {
             {/* users list header */}
             <header className=" p-2 text-center border-2  w-full rounded-lg flex justify-between items-center">
               <h2 className=" font-semibold flex-grow text-xl ">
-                Select users <span className=" bg-red-300 px-2 py-0 rounded-full">{selectedUsersIds.length}</span>
+                Select users{" "}
+                <span className=" bg-red-300 px-2 py-0 rounded-full">
+                  {selectedUsersIds.length}
+                </span>
               </h2>
               <p
                 type="button"
@@ -579,7 +626,10 @@ function ShowProject() {
             {/* users list header */}
             <header className=" p-2 text-center border-2  w-full rounded-lg flex justify-between items-center">
               <h2 className=" font-semibold flex-grow text-xl ">
-                Select users <span className=" bg-green-300 px-2 py-0 rounded-full">{selectedUsersIdsRM.length}</span>
+                Select users{" "}
+                <span className=" bg-green-300 px-2 py-0 rounded-full">
+                  {selectedUsersIdsRM.length}
+                </span>
               </h2>
               <p
                 type="button"

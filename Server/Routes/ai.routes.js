@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { generateDataContent } from "../Controller/ai.controllers.js";
 
-const routes = Router();
+const aIroutes = Router();
 
-routes.get('/get-result', generateDataContent);
+aIroutes.get('/get-result', generateDataContent);
 
-export default routes;
+export default aIroutes;
