@@ -28,3 +28,10 @@ export const sendMsg = (eventName, data) => {
 export const receiveMsg = (eventName, cb) => {
   socketInstance.on(eventName, cb);
 };
+
+export const refreshPage = (eventName, cb) => {
+  socketInstance.emit(eventName, cb)
+}
+export const getRefreshPage = (eventName, cb) => {
+  socketInstance.on(eventName, cb)
+}

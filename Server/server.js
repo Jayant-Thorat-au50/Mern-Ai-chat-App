@@ -57,6 +57,7 @@ io.use(async (socket, next) => {
     socket.user = decoded;
     socket.project = project;
 
+
     if (!socket.project.users.includes(socket.user.id)) {
       return next(new Error("You are no longer a member of this project"));
     }
@@ -67,12 +68,11 @@ io.use(async (socket, next) => {
   }
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   socket.roomId = socket.project._id.toString();
 
-  console.log("a user connected");
-
   socket.join(socket.roomId);
+  console.log("a user connected");
 
   socket.on("project-message", async (data) => {
     const user = await UserModel.findById(data.sender);
@@ -87,8 +87,10 @@ io.on("connection", (socket) => {
     const dataToSend = {
       sender: user.email,
       message: data.message,
+      time:data.time,
     };
-
+  // sending the message response from ai to the group chat
+    // if the message contains @ai then we will send the message to the ai and get the response and send it to the group chat
     const messageForAi = data.message.includes("@ai");
     if (messageForAi) {
       try {
@@ -100,6 +102,7 @@ io.on("connection", (socket) => {
       io.to(socket.roomId).emit("project-message", {
         sender: "Gemini 2.0 flash",
         message: response,
+        time:data.time,
       });
       return;
     } catch (error) {
@@ -113,6 +116,10 @@ io.on("connection", (socket) => {
 
     socket.broadcast.to(socket.roomId).emit("project-message", dataToSend);
   });
+
+  socket.on('trigger-action', (data) => {
+    socket.broadcast.to(socket.roomId).emit("trigger-action", data);
+  })
 
   socket.on("event", (dataToSend) => {
     /* … */

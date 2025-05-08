@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosinstace from "../../Helpers/AxiosInstance";
 import toast from "react-hot-toast";
-import { CatIcon } from "lucide-react";
 
 const initialState = {
   projectsList: [],

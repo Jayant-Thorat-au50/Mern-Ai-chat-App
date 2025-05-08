@@ -14,7 +14,6 @@ function Projects() {
     })();
   }, []);
 
-  console.log(projects);
 
   return (
     <div>
@@ -22,7 +21,7 @@ function Projects() {
         <div
           key={project._id}
           typeof="button"
-          className=" flex justify-center  items-center p-4 pr-0 border-2 border-black w-44"
+          className=" flex cursor-pointer justify-center  items-center p-4 pr-0 border-2 border-black w-44"
         >
           <h2
             onClick={() =>

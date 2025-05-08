@@ -1,9 +1,9 @@
-import React, { Component, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiSend } from "react-icons/fi";
-import { useLocation } from "react-router-dom";
+import { data, useLocation, useNavigate } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
-import { FaPlus, FaUser, FaUserFriends } from "react-icons/fa";
+import { FaLongArrowAltLeft, FaPlus, FaUser, FaUserFriends } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../Redux/Slices/AuthSlice";
 import Markdown from "markdown-to-jsx";
@@ -16,12 +16,12 @@ import {
   initializeSocket,
   sendMsg,
   receiveMsg,
+  refreshPage,
+  getRefreshPage,
 } from "../Helpers/socketInstance.js";
 import "../../src/App.css";
 import toast from "react-hot-toast";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { solarizedDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 function ShowProject() {
   const { state } = useLocation();
@@ -38,10 +38,12 @@ function ShowProject() {
   const [incomingMessageLoading, setIncomingMessageLoading] = useState(true);
   const [messages, setMessages] = useState([]);
   const [aiMessageLoading, setAiMessageLoading] = useState(false);
+  
 
   const messageBox = useRef(null);
 
   const dispacth = useDispatch();
+  const navigate = useNavigate()
   let { AllUsersList } = useSelector((state) => state?.authState);
   const { user } = useSelector((state) => state?.authState);
 
@@ -126,6 +128,7 @@ function ShowProject() {
       );
 
       if (response.payload.success) {
+       
         getUpdatedProject(projectUtilsStates.project._id);
         setProjectUtilsStates((prev) => ({
           ...prev,
@@ -141,7 +144,13 @@ function ShowProject() {
         })
       );
 
+      refreshPage("trigger-action", (data) => {});
+
       if (response.payload.success) {
+        getRefreshPage("trigger-action", (data) => {
+          window.location.reaload();
+        });
+
         getUpdatedProject(projectUtilsStates.project._id);
         setProjectUtilsStates((prev) => ({
           ...prev,
@@ -171,10 +180,14 @@ function ShowProject() {
       console.log(projectUtilsStates.project);
     }
 
+    const hours = new Date().getHours();
+    const minutes = new Date().getMinutes();
+
     if (projectUtilsStates.message.trim() === "") return;
     const sent = sendMsg("project-message", {
       message: projectUtilsStates.message,
       sender: user._id,
+      time: `${hours}:${minutes}`,
     });
 
     if (!sent) {
@@ -186,6 +199,7 @@ function ShowProject() {
     const data = {
       message: projectUtilsStates.message,
       sender: user._id,
+      time: `${hours}:${minutes}`,
     };
 
     setMessages((prev) => [...prev, { ...data, received: false }]);
@@ -288,13 +302,13 @@ function ShowProject() {
               typeof child === "object" &&
               ["ol", "ul", "div", "pre"].includes(child?.type)
           );
-  
+
           // Avoid <p> if block-level children are present
           return containsBlock ? <>{children}</> : <p {...props}>{children}</p>;
         },
       },
       pre: {
-        component: ({ children }) => <div>{children}</div>
+        component: ({ children }) => <div>{children}</div>,
       },
       code: {
         component: ({ className = "", children, ...props }) => {
@@ -340,7 +354,7 @@ function ShowProject() {
     getUpdatedProject(state._id);
     getAllUsersList();
     receiveMsg("project-message", (data) => {
-      console.log(data);
+      
       setMessages((prev) => [...prev, { ...data, received: true }]);
       // appendIncomingMessage(data);
     });
@@ -375,7 +389,6 @@ function ShowProject() {
             </div>
           </header>
 
-          <div></div>
           <div className=" w-full border border-black border-t-0 bg-slate-300 flex gap-2 justify-start items-center py-2 px-4">
             <div className=" w-full flex gap-3 items-center">
               <span className=" p-2 aspect-square bg-white">
@@ -412,9 +425,9 @@ function ShowProject() {
         </div>
 
         {/* header of the window */}
-        <header className=" py-2 flex justify-between  items-center lg:px-5 px-1 bg-slate-400 w-full">
-          <div className=" flex gap-2 items-center border-black px-2 border py-1 rounded-md ">
-            <FaPlus />
+        <header className=" py-1.5 flex justify-between  items-center lg:px-5 px-1 bg-slate-400 w-full">
+          <div className=" flex gap-5 items-center  px-2  py-1 rounded-md ">
+            <FaLongArrowAltLeft onClick={() => navigate(-1)} />
             <button
               onClick={() => {
                 setProjectUtilsStates((prev) => ({
@@ -423,7 +436,7 @@ function ShowProject() {
                 }));
               }}
             >
-              Add collaborators
+              Add collabs
             </button>
             <button
               onClick={() => {
@@ -441,7 +454,7 @@ function ShowProject() {
             >
               remove
             </button>
-            <span className=" border-2 p-1 rounded-full">
+            <span className=" border-2 p-1 px-3 rounded-full">
               {projectUtilsStates.project.users.length}
             </span>
           </div>
@@ -465,31 +478,48 @@ function ShowProject() {
             const color = generateRandomColorStyle();
             return !msg.received ? (
               /* sent message */
-              <div key={idx} className="text-wrap break-words w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black">
+              <div
+                key={idx}
+                className="text-wrap break-words gap-1 w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 py-2 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black flex flex-col py-0"
+              >
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
-                  <p className={`text-xs font-bold`} style={{ color: color }}>
+                  <p
+                    className={`text-xs font-bold opacity-95`}
+                    style={{ color: color }}
+                  >
                     @{user.email.slice(0, user.email.indexOf("@"))}
                   </p>
                 </div>
-                <p className=" font-semibold">{msg.message}</p>
+                <div className=" flex justify-between items-end">
+                  <p className=" font-semibold">{msg.message}</p>
+                  <p className=" font-light text-[0.5rem] text-gray-800">
+                    {msg.time}
+                  </p>
+                </div>
               </div>
             ) : msg.sender == "Gemini 2.0 flash" ? (
               /* message from ai */
-              <div key={idx} className=" text-wrap break-words w-11/12 max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto">
+              <div
+                key={idx}
+                className=" text-wrap break-words w-11/12 max-w-96 bg-black mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-white overflow-auto"
+              >
                 <div className="flex justify-start gap-1 items-center">
-                  <span className=" border-2  p-1.5 rounded-full"></span>
+                  <span className=" border-2 p-1.5 rounded-full"></span>
                   <p className={`text-xs font-bold]`} style={{ color: color }}>
                     @{msg.sender}
                   </p>
                 </div>
                 <div className=" font-semibold">
-                  <Markdown options={options}>{msg.message}</Markdown>
+                  <Markdown children={msg.text} options={options}>{JSON.parse(msg.message).text}</Markdown>
                 </div>
               </div>
             ) : (
               /* received  message */
-              <div key={idx} className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black">
+              <div
+                key={idx}
+                className="text-wrap break-words w-fit max-w-80 bg-gray-100 mb-0.5 p-1 my-1 mr-0.5 rounded-xl rounded-tl-none animate-fade-in text-black"
+              >
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
                   <p
@@ -499,7 +529,12 @@ function ShowProject() {
                     @{msg.sender.slice(0, msg.sender.indexOf("@"))}
                   </p>
                 </div>
-                <p className=" font-semibold">{msg.message}</p>
+                <div className=" flex justify-between items-end gap-2">
+                  <p className=" font-semibold">{msg.message}</p>
+                  <p className=" font-light text-[0.5rem] text-gray-800">
+                    {msg.time}
+                  </p>
+                </div>
               </div>
             );
           })}
@@ -517,12 +552,12 @@ function ShowProject() {
               }))
             }
             onKeyDown={sendOnEnter}
-            className="w-full focus:outline-none border p-2 rounded bg-gray-700 text-white"
+            className="w-full focus:outline-none border p-2 px-4 rounded-full bg-gray-700 text-white"
             placeholder="Type a message.................."
           />
           <button
             onClick={send}
-            className=" p-3 hover:bg-gray-500  border rounded border-white"
+            className=" p-3 hover:bg-gray-500  border rounded-full border-white"
           >
             <FiSend className="text-lg" />
           </button>
