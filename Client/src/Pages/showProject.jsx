@@ -40,14 +40,14 @@ function ShowProject() {
     message: "",
     removeFromProjectModal: false,
     fileTree: {
-      "app.js": {
-        content:
-          "const express = require('express');\n\nconst app = express();\n\napp.get('/', (req, res) => {\n    res.send('Hello World!');\n});\napp.listen(3000, () => {\n    console.log('Server is running on port 3000');\n})",
-      },
-      "package.json": {
-        content:
-          '{\n    "name": "temp-server",\n    "version": "1.0.0",\n    "main": "index.js",\n    "scripts": {\n        "test": "echo \\"Error: no test specified\\" && exit 1"\n    },\n    "keywords": [],\n    "author": "",\n    "license": "ISC",\n    "description": "",\n    "dependencies": {\n        "express": "^4.21.2"\n    }\n}',
-      },
+    //   "app.js": {
+    //     content:
+    //       "const express = require('express');\n\nconst app = express();\n\napp.get('/', (req, res) => {\n    res.send('Hello World!');\n});\napp.listen(3000, () => {\n    console.log('Server is running on port 3000');\n})",
+    //   },
+    //   "package.json": {
+    //     content:
+    //       '{\n    "name": "temp-server",\n    "version": "1.0.0",\n    "main": "index.js",\n    "scripts": {\n        "test": "echo \\"Error: no test specified\\" && exit 1"\n    },\n    "keywords": [],\n    "author": "",\n    "license": "ISC",\n    "description": "",\n    "dependencies": {\n        "express": "^4.21.2"\n    }\n}',
+    //   },
     },
     currentFile: null,
     openFiles: [],
@@ -611,6 +611,8 @@ console.log(projectUtilsStates.fileTree);
       {/* Right Content Window */}
       <section className=" w-9/12 bg-gray-200 gap-0 flex">
         <div className="Explorer w-fit min-w-40 h-screen  m-0 bg-gray-600">
+
+          {/* list of the filetree */}
           <ul className="file-tree">
             {projectUtilsStates.fileTree &&
               Object.keys(projectUtilsStates.fileTree).map((file, idx) => (
@@ -631,12 +633,12 @@ console.log(projectUtilsStates.fileTree);
           </ul>
         </div>
         <div className="code-editor w-10/12 max-h-screen flex items-start bg-black">
-          <div className="list-files w-full h-full border ">
+          <div className="list-files w-full h-full ">
             {/* header of the code editor "open files list" */}
             <div className=" flex justify-between items-center pe-3 ">
               <ul className=" flex items-center w-full ">
 
-              {/* list of open files */}
+              {/* list of open files header of the code editor */}
               {projectUtilsStates.openFiles &&
                 projectUtilsStates.openFiles.map((file, idx) => (
                  file === projectUtilsStates.currentFile ? (
