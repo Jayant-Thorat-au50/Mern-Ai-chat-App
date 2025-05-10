@@ -12,6 +12,10 @@ import Projects from "./Pages/Projects.jsx";
 import ShowProject from "./Pages/showProject.jsx";
 import ShowProjectGPT from "./Pages/showProjectGPT.jsx";
 import UserAuth from "./Helpers/UserAuth.jsx";
+import HomePage from "./Pages/Homeui2.jsx";
+import HomePage3 from "./Pages/Homeui2.jsx";
+import HomePage4 from "./Pages/homeUI4.jsx";
+import HomePage5 from "./Pages/ui5.jsx";
 
 
 
@@ -29,6 +33,10 @@ function App() {
       <Route path="/projects" element={<Projects />} />
       <Route path="/project-details" element={<UserAuth><ShowProject/></UserAuth>} />
       <Route path="/ShowProjectGPT" element={<ShowProjectGPT />} />
+      <Route path="/UI2" element={<HomePage />} />
+      <Route path="/UI3" element={<HomePage3 />} />
+      <Route path="/UI4" element={<HomePage4 />} />
+      <Route path="/UI5" element={<HomePage5 />} />
     </Routes>
   );
 }

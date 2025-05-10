@@ -1,9 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FiSend } from "react-icons/fi";
+import { FiCrosshair, FiSend } from "react-icons/fi";
 import { data, useLocation, useNavigate } from "react-router-dom";
 import { TiGroup } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
-import { FaLongArrowAltLeft, FaPlus, FaUser, FaUserFriends } from "react-icons/fa";
+import {
+  FaCross,
+  FaLongArrowAltLeft,
+  FaPlus,
+  FaUser,
+  FaUserFriends,
+} from "react-icons/fa";
+import { ImCross } from "react-icons/im";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../Redux/Slices/AuthSlice";
 import Markdown from "markdown-to-jsx";
@@ -32,18 +39,29 @@ function ShowProject() {
     project: state,
     message: "",
     removeFromProjectModal: false,
+    fileTree: {
+      "app.js": {
+        content:
+          "const express = require('express');\n\nconst app = express();\n\napp.get('/', (req, res) => {\n    res.send('Hello World!');\n});\napp.listen(3000, () => {\n    console.log('Server is running on port 3000');\n})",
+      },
+      "package.json": {
+        content:
+          '{\n    "name": "temp-server",\n    "version": "1.0.0",\n    "main": "index.js",\n    "scripts": {\n        "test": "echo \\"Error: no test specified\\" && exit 1"\n    },\n    "keywords": [],\n    "author": "",\n    "license": "ISC",\n    "description": "",\n    "dependencies": {\n        "express": "^4.21.2"\n    }\n}',
+      },
+    },
+    currentFile: null,
+    openFiles: [],
   });
   const [selectedUsersIds, setSelectedUsersIds] = useState([]);
   const [selectedUsersIdsRM, setSelectedUsersIdsRM] = useState([]);
   const [incomingMessageLoading, setIncomingMessageLoading] = useState(true);
   const [messages, setMessages] = useState([]);
   const [aiMessageLoading, setAiMessageLoading] = useState(false);
-  
 
   const messageBox = useRef(null);
 
   const dispacth = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   let { AllUsersList } = useSelector((state) => state?.authState);
   const { user } = useSelector((state) => state?.authState);
 
@@ -55,6 +73,7 @@ function ShowProject() {
   const usersToRemove = projectUtilsStates.project.users.filter(
     (u) => user._id !== u._id
   );
+console.log(projectUtilsStates.fileTree);
 
   const getAllUsersList = async () => {
     await dispacth(getAllUsers());
@@ -128,7 +147,6 @@ function ShowProject() {
       );
 
       if (response.payload.success) {
-       
         getUpdatedProject(projectUtilsStates.project._id);
         setProjectUtilsStates((prev) => ({
           ...prev,
@@ -292,6 +310,11 @@ function ShowProject() {
     scrollToBottom();
   };
 
+
+  console.log(projectUtilsStates?.fileTree[projectUtilsStates?.currentFile]?.file?.contents);
+  console.log(projectUtilsStates.openFiles);
+  
+
   const options = {
     overrides: {
       p: {
@@ -353,9 +376,28 @@ function ShowProject() {
 
     getUpdatedProject(state._id);
     getAllUsersList();
-    receiveMsg("project-message", (data) => {
-      
+    receiveMsg("project-message", (data) => {      
+      try {
+        if (typeof(data.message) !== Object || JSON.parse(data.message).fileTree) {
+          console.log(JSON.parse(data.message).fileTree);
+          
+       setProjectUtilsStates((prev) => ({
+          ...prev,
+          fileTree: JSON.parse(data.message).fileTree,
+          currentFile:JSON.parse(data.message).fileTree[0]
+        }));
+       setProjectUtilsStates((prev) => ({
+          ...prev,
+          currentFile:Object.keys(JSON.parse(data.message).fileTree)[Object.keys(JSON.parse(data.message).fileTree).length - 1],
+          openFiles:[Object.keys(JSON.parse(data.message).fileTree)[0]]
+        }));
+        
+        
+      }
       setMessages((prev) => [...prev, { ...data, received: true }]);
+      } catch (error) {
+      setMessages((prev) => [...prev, { ...data, received: true }]);
+      }
       // appendIncomingMessage(data);
     });
   }, []);
@@ -480,7 +522,7 @@ function ShowProject() {
               /* sent message */
               <div
                 key={idx}
-                className="text-wrap break-words gap-1 w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1 py-2 my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black flex flex-col py-0"
+                className="text-wrap break-words gap-1 w-fit max-w-80 mb-0.5 ml-auto bg-gray-100 p-1  my-1 mr-0.5 rounded-xl rounded-tr-none animate-fade-in text-black flex flex-col py-0"
               >
                 <div className="flex justify-start gap-1 items-center">
                   <span className=" border-2  p-1.5 rounded-full"></span>
@@ -511,7 +553,9 @@ function ShowProject() {
                   </p>
                 </div>
                 <div className=" font-semibold">
-                  <Markdown children={msg.text} options={options}>{JSON.parse(msg.message).text}</Markdown>
+                  <Markdown children={msg.text} options={options}>
+                    {JSON.parse(msg.message).text}
+                  </Markdown>
                 </div>
               </div>
             ) : (
@@ -565,9 +609,89 @@ function ShowProject() {
       </section>
 
       {/* Right Content Window */}
-      <section className=" w-9/12 bg-gray-200 p-4">
-        <h2 className="text-lg font-bold">Right-side Content</h2>
-        <p>This section is for other content.</p>
+      <section className=" w-9/12 bg-gray-200 gap-0 flex">
+        <div className="Explorer w-fit min-w-40 h-screen  m-0 bg-gray-600">
+          <ul className="file-tree">
+            {projectUtilsStates.fileTree &&
+              Object.keys(projectUtilsStates.fileTree).map((file, idx) => (
+                <li
+                  onClick={() =>{
+                    setProjectUtilsStates((prev) => ({
+                      ...prev,
+                      openFiles: [...new Set([...prev.openFiles, file])],
+                    }))
+                    setProjectUtilsStates(prev => ({...prev, currentFile:file}))
+                  }}
+                  key={idx}
+                  className=" border-2 border-t-1 border-b-1 p-1 text-white"
+                >
+                  {file}{" "}
+                </li>
+              ))}
+          </ul>
+        </div>
+        <div className="code-editor w-10/12 max-h-screen flex items-start bg-black">
+          <div className="list-files w-full h-full border ">
+            {/* header of the code editor "open files list" */}
+            <div className=" flex justify-between items-center pe-3 ">
+              <ul className=" flex items-center w-full ">
+
+              {/* list of open files */}
+              {projectUtilsStates.openFiles &&
+                projectUtilsStates.openFiles.map((file, idx) => (
+                 file === projectUtilsStates.currentFile ? (
+                   <li
+                  onClick={() => setProjectUtilsStates(prev => ({...prev, currentFile:file}))}
+                    key={idx}
+                    className=" border text-white gap-1.5 flex items-center justify-between bg-green-200  w-fit border-r  h-full ps-2 "
+                  >
+                    <span>{file}</span>{" "}
+                    <span
+                    className=" h-full py-2.5 hover:border-red-500 border border-transparent w-fit px-2" 
+                    onClick={() => {
+                      setProjectUtilsStates(prev => ({...prev, openFiles:prev.openFiles.filter(Ofile => Ofile !== file)}))
+                  
+                    }}>
+                      <ImCross className="  h-full p-0 text-xs font-light" />
+                    </span>{" "}
+                  </li>
+                 ):( <li
+                  onClick={() => setProjectUtilsStates(prev => ({...prev, currentFile:file}))}
+                    key={idx}
+                    className=" border text-white gap-1.5 flex items-center justify-between  w-fit border-r  h-full ps-2 "
+                  >
+                    <span>{file}</span>{" "}
+                    <span
+                    className=" h-full py-2.5 hover:border-red-500 border border-transparent w-fit px-2" 
+                    onClick={() => {
+                      setProjectUtilsStates(prev => ({...prev, openFiles:prev.openFiles.filter(Ofile => Ofile !== file)}))
+                  
+                    }}>
+                      <ImCross className="  h-full p-0 text-xs font-light" />
+                    </span>{" "}
+                  </li>)
+                ))}
+            </ul>
+
+                  <button className=" text-white">run</button>
+            </div>
+
+            {/* code of the opened file */}
+            {projectUtilsStates.currentFile && (<div className=" w-full h-full text-white ">
+                  {/* <h2 className=" text-lg font-semibold">code</h2> */}
+                  <textarea
+                  contentEditable
+                  onChange={() => {}}
+                  className=" w-full min-h-[100vh] max-h-[90vh] bg-black text-white p-2"
+                    value={projectUtilsStates.fileTree[projectUtilsStates.currentFile]?.file?.contents}
+                  />
+              </div>)}
+           
+
+
+          </div>
+    
+        </div>
       </section>
 
       {/* add collaborators modal */}
